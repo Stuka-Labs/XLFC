@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import env from '../lib/env'
 
 interface AuthContextInterface {
   user: FirebaseAuthTypes.User | null;
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((user) => {
-      console.log("user logged in!", user);
+      // console.log("user logged in!", user);
       setUser(user);
       setLoading(false);
     });
@@ -43,13 +44,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string | undefined, password: string | undefined) => {
     try {
+      email = env.IS_PROD ? email : env.USER_EMAIL;
+      password = env.IS_PROD ? password : env.USER_PASSWORD;
+      console.log("Attempting login with email:", email);
+
+      if (!email || !password) {
+        throw new Error("Email and Password are required for login");
+      }
+
       await auth().signInWithEmailAndPassword(email, password);
-    } catch (error) {
-      console.error("Error logging in: ", error);
+      console.log("Login successful");
+    } catch (error: any) {
+      // console.error("Login error:", error);
+
+      if (error.code === "auth/invalid-credential") {
+        error.message = "Invalid credential. Ensure the token or credentials are correct.";
+      } else if (error.code === "auth/wrong-password") {
+        error.message = "Incorrect password.";
+      } else if (error.code === "auth/user-not-found") {
+        error.message = "No user found with this email.";
+      } else {
+        error.message = error.message || "Unknown login error.";
+      }
+
+      // Rethrow the error so it can be handled in the calling function
+      throw error;
     }
   };
+
+
 
   const logout = async () => {
     try {
