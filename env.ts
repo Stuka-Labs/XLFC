@@ -18,7 +18,7 @@ const development: EnvConfig = {
   USER_PASSWORD: "G9&kL!zX2@Yt~",
   IS_PROD: false,
   USER_PHONE: "+19169479632",
-  GOOGLE_SERVICES_FILE: "GoogleService-Info.plist",
+  GOOGLE_SERVICES_FILE: "./GoogleService-Info.plist",
 };
 
 const production: EnvConfig = {
@@ -27,7 +27,7 @@ const production: EnvConfig = {
   BUNDLE_ID: "com.stuka.xlfc",
   IS_PROD: true,
   USER_PHONE: "",
-  GOOGLE_SERVICES_FILE: "GoogleService-Info.plist",
+  GOOGLE_SERVICES_FILE: "./GoogleService-Info.plist",
 };
 
 const env: EnvConfig = process.env.NODE_ENV === "production" ? production : development;
