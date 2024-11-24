@@ -25,6 +25,12 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      - name: Debug EXPO_TOKEN
+        run: echo "EXPO_TOKEN=$EXPO_TOKEN"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+              
+
       # Step 4: Trigger EAS Build
       - name: Run EAS Build
         env:
