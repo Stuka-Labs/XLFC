@@ -3,10 +3,10 @@ name: EAS Build
 on:
   push:
     branches:
-      - main # Change this to the branch you want to trigger builds
+      - main
 
 jobs:
-  eas-build:
+  build:
     name: Build with EAS
     runs-on: ubuntu-latest
 
@@ -19,20 +19,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16 # Match the Node.js version required by your project
+          node-version: 16
 
       # Step 3: Install EAS CLI
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # Step 4: Authenticate with EAS
-      - name: Authenticate with EAS
-        env:
-          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
-        run: eas login --token $EAS_TOKEN
+      # Step 4: Set EAS Token
+      - name: Set EAS Token
+        run: echo "EAS_TOKEN=${{ secrets.EAS_TOKEN }}" >> $GITHUB_ENV
 
-      # Step 5: Trigger EAS build
-      - name: Trigger EAS Build
+      # Step 5: Trigger EAS Build
+      - name: Run EAS Build
         env:
           EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
-        run: eas build --platform all --non-interactive
+        run: eas build --platform ios --non-interactive
