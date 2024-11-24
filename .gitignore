@@ -19,13 +19,11 @@ web-build/
 expo-env.d.ts
 # @end expo-cli
 
-resources/google-services.json
-resources/GoogleService-Info.plist
+
 
 /ios
 /android
 /ios_backup
 /android_backup
-*.plist
 google-service-info.b64
 *.env*
