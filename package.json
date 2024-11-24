@@ -6,7 +6,7 @@
     "start": "npx expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
-    "ios": "export NODE_OPTIONS=--no-warnings && npx expo start",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
@@ -14,7 +14,7 @@
     "eas-build-pre-install": "echo \"$GOOGLE_SERVICE_INFO_PLIST\" && echo \"$GOOGLE_SERVICE_INFO_PLIST\" > ./GoogleService-Info.plist"
   },
   "jest": {
-    "preset":  "jest-expo"
+    "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
