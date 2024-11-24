@@ -27,10 +27,10 @@ jobs:
 
       # Step 4: Set EAS Token
       - name: Set EAS Token
-        run: echo "EAS_TOKEN=${{ secrets.EAS_TOKEN }}" >> $GITHUB_ENV
+        run: echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" >> $GITHUB_ENV
 
       # Step 5: Trigger EAS Build
       - name: Run EAS Build
         env:
-          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform ios --non-interactive
