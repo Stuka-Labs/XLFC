@@ -9,8 +9,14 @@ if [ ! -f GoogleService-Info.plist ]; then
   exit 1
 fi
 
-# Step 2: Encode the plist file into base64
-base64 GoogleService-Info.plist > GoogleServiceInfo.b64
+# Step 2: Encode the plist file into Base64 (cross-platform compatible)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  base64 -i GoogleService-Info.plist -o GoogleServiceInfo.b64
+else
+  # Linux
+  base64 GoogleService-Info.plist > GoogleServiceInfo.b64
+fi
 
 # Step 3: Verify the Base64 file
 if [ ! -s GoogleServiceInfo.b64 ]; then
@@ -25,7 +31,7 @@ if [ ! -f eas.json ]; then
 fi
 
 # Step 5: Create the EAS secret
-eas env:create --environment production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project  --visibility sensitive --non-interactive
+eas env:create --environment production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive --non-interactive
 
 # Step 6: Verify the variable
 eas env:list production
