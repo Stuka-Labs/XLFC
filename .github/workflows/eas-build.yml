@@ -29,17 +29,15 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # Step 5: Encode GoogleService-Info.plist
-      - name: Encode GoogleService-Info.plist
-        run: base64 GoogleService-Info.plist > GoogleServiceInfo.b64
+      # Step 5: Make automate-secrets.sh Executable
+      - name: Make Script Executable
+        run: chmod +x ./automate-secrets.sh
 
-      # Step 6: Create EAS Secret
-      - name: Create EAS Secret
-        run: |
-          eas env:create --environment production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project
-          eas env:list --non-interactive
+      # Step 6: Run automate-secrets.sh
+      - name: Run Automate Secrets Script
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: ./automate-secrets.sh
 
       # Step 7: Run EAS Build
       - name: Run EAS Build
