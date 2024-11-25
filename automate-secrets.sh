@@ -23,11 +23,12 @@ if [ ! -f eas.json ]; then
   exit 1
 fi
 
+chmod +r ./GoogleServiceInfo.b64
 # # Step 4: Delete existing variable if it exists
 # eas env:delete --variable-name GOOGLE_SERVICE_INFO_PLIST --non-interactive || echo "No existing variable to delete."
 
 # Step 5: Create the environment variable
-eas env:create production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive
+eas env:create --environment production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive --non-interactive
 
 # Step 6: Verify the variable
 eas env:list production

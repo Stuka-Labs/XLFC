@@ -14,12 +14,11 @@ web-build/
 .DS_Store
 
 
-
-
-
 /ios
 /android
 /ios_backup
 /android_backup
 google-service-info.b64
 *.env*
+GoogleService-info.plist
+\GoogleService-info.plist

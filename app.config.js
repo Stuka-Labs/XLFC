@@ -7,6 +7,7 @@ export default {
         scheme: "xlfc",
         ios: {
             googleServicesFile: process.env.GOOGLE_SERVICE_INFO_PLIST_PATH || './GoogleService-Info.plist',
+            bundleIdentifier: "com.stuka.xlfc",
         },
         extra: {
             eas: {
