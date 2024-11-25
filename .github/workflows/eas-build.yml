@@ -19,17 +19,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       # Step 3: Install Dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 4: Install EAS CLI
+      # Step 4: Install CocoaPods
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      # Step 5: Install EAS CLI
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # Step 5: Run EAS Build
+      # Step 6: Run EAS Build
       - name: Run EAS Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
