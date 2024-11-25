@@ -11,7 +11,9 @@
     "ios": {
       "usesAppleSignIn": true,
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.stuka.xlfc"
+      "bundleIdentifier": "com.stuka.xlfc",
+      "distribution": "store",
+      "appleTeamId": "3DD6F82UBL"
     },
     "android": {
       "adaptiveIcon": {
