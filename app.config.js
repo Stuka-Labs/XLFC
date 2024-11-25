@@ -2,6 +2,7 @@ export default {
     expo: {
         name: "XLFC",
         slug: "XLFC",
+        "scheme": "xlfc",
         ios: {
             googleServicesFile: './GoogleService-Info.plist',
         },

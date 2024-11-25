@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 interface EnvConfig {
   API_DOMAIN: string;
   APP_NAME: string;
@@ -10,27 +14,33 @@ interface EnvConfig {
   GOOGLE_SERVICES_FILE: string;
 }
 
-const development: EnvConfig = {
-  API_DOMAIN: "http://127.0.0.1:5001/xlfc-e8f8f/us-central1/{{endpoint}}/",
-  APP_NAME: "XLFC Dev",
-  BUNDLE_ID: "com.stuka.xlfc.dev",
-  USER_EMAIL: "shakelyconsulting@gmail.com",
-  USER_PASSWORD: "G9&kL!zX2@Yt~",
-  IS_PROD: false,
-  USER_PHONE: "+19169479632",
-  GOOGLE_SERVICES_FILE: "./GoogleService-Info.plist",
+const getConfig = (): EnvConfig => {
+  if (process.env.NODE_ENV === "production") {
+    return {
+      API_DOMAIN: process.env.PROD_API_DOMAIN!,
+      APP_NAME: process.env.PROD_APP_NAME!,
+      BUNDLE_ID: process.env.PROD_BUNDLE_ID!,
+      USER_EMAIL: undefined,
+      USER_PASSWORD: undefined,
+      IS_PROD: process.env.PROD_IS_PROD === "true",
+      USER_PHONE: process.env.PROD_USER_PHONE || "",
+      GOOGLE_SERVICES_FILE: process.env.PROD_GOOGLE_SERVICES_FILE!,
+    };
+  } else {
+    return {
+      API_DOMAIN: process.env.DEV_API_DOMAIN!,
+      APP_NAME: process.env.DEV_APP_NAME!,
+      BUNDLE_ID: process.env.DEV_BUNDLE_ID!,
+      USER_EMAIL: process.env.DEV_USER_EMAIL,
+      USER_PASSWORD: process.env.DEV_USER_PASSWORD,
+      IS_PROD: process.env.DEV_IS_PROD === "true",
+      USER_PHONE: process.env.DEV_USER_PHONE!,
+      GOOGLE_SERVICES_FILE: process.env.DEV_GOOGLE_SERVICES_FILE!,
+    };
+  }
 };
 
-const production: EnvConfig = {
-  API_DOMAIN: "https://{{endpoint}}-hhjsyj7q4q-uc.a.run.app/",
-  APP_NAME: "XLFC",
-  BUNDLE_ID: "com.stuka.xlfc",
-  IS_PROD: true,
-  USER_PHONE: "",
-  GOOGLE_SERVICES_FILE: "./GoogleService-Info.plist",
-};
-
-const env: EnvConfig = process.env.NODE_ENV === "production" ? production : development;
+const env: EnvConfig = getConfig();
 
 env.API_DOMAIN_WITH_ENDPOINT = (endpoint: string): string =>
   env.API_DOMAIN.replace("{{endpoint}}", endpoint);

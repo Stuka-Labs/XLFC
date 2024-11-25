@@ -30,6 +30,7 @@ const LoginScreen = () => {
     try {
       setInProgress(true);
 
+      console.log('logging in in login.tsx ' + email + ' ' + password);
       // Log in the user immediately after successful registration
       const maybeUser = await login(email, password);
 

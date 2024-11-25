@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const authInstance = getAuth();
 
-    if (!env.IS_PROD) {
+    if (!process.env.IS_PROD) {
       try {
         connectAuthEmulator(authInstance, "http://127.0.0.1:9099");
       } catch (error) {
@@ -91,8 +91,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setInProgress(true); // Mark the process as in progress
       const auth = getAuth();
-      email = env.IS_PROD || isAutoCreate ? email : env.USER_EMAIL;
-      password = env.IS_PROD || isAutoCreate ? password : env.USER_PASSWORD;
       console.log(`email from login authContext: ${email}`);
       console.log(`password from login authContext: ${password}`);
 
@@ -161,7 +159,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     email: string | undefined,
     password: string | undefined,
     firstName?: string | undefined,
-    lastName?: string | undefined,
+    surName?: string | undefined,
     phoneNumber?: string | undefined,
     isAutoCreate: boolean = false
   ) => {
@@ -169,9 +167,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setInProgress(true); // Mark the registration process as in progress
 
       // Default to `env.USER_EMAIL` or `env.USER_PASSWORD` if undefined
-      email = (email && email.trim() !== "") || isAutoCreate ? email : env.USER_EMAIL;
+      email = (email && email.trim() !== "") || isAutoCreate ? email : process.env.TEST_EMAIL;
       password =
-        (password && password.trim() !== "") || isAutoCreate ? password : env.USER_PASSWORD;
+        (password && password.trim() !== "") || isAutoCreate ? password : process.env.TEST_PASSWORD;
 
       if (!email || !password) {
         throw new Error("Email and Password are required for registration");
@@ -190,7 +188,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password,
         confirmPassword: password,
         firstName,
-        surName: lastName,
+        surName: surName,
         phoneNumber,
       };
 

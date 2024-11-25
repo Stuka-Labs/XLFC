@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { useState, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Checkbox from "@/components/inputs/Checkbox";
@@ -17,8 +17,8 @@ import defaults from "../../lib/defaults";
 const RegisterScreen = () => {
   const { register, login, logout, user, auth } = useAuth();
   // const [fullName, setFullName] = useState('')
-  const [firstName, setFirstName] = useState("Joe");
-  const [surName, setSurName] = useState("Shakely");
+  const [firstName, setFirstName] = useState("");
+  const [surName, setSurName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [email, setEmail] = useState();
   const [phoneNumber, setPhoneNumber] = useState(
@@ -30,7 +30,8 @@ const RegisterScreen = () => {
   const [autoCreate, setAutoCreate] = useState(false);
 
   const handleRegister = async () => {
-    if (env.IS_PROD && (!email || !password || password !== confirmPassword)) {
+    console.log('IS_PROD from register.jsx', process.env.IS_PROD);
+    if (process.env.IS_PROD && (!email || !password || password !== confirmPassword)) {
       defaults.simpleAlert(
         "Validation Error",
         !email || !password
@@ -42,10 +43,19 @@ const RegisterScreen = () => {
 
     try {
       setInProgress(true); // Indicate registration is in progress
+      if (password === "" && email === "") {
+        Alert.alert("Error", "Email and password required.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        Alert.alert("Error", "Passwords do not match.");
+        return;
+      }
 
       // Register the user
       await register(email, password, firstName, surName, phoneNumber);
-
+      console.log('email and password from register.tsx being sent to authContext login ' + email + ' ' + password);
       // Log in the user immediately after successful registration
       await login(email, password);
 
@@ -94,9 +104,9 @@ const RegisterScreen = () => {
       const predefinedUser = {
         firstName: "Bob",
         surName: "Loblaw",
-        email: "bobloblaw@gmail.com",
-        phoneNumber: "+19169479669",
-        password: "AutoUser123!",
+        email: process.env.TEST_USER,
+        phoneNumber: process.env.TEST_PHONE,
+        password: process.env.TEST_PASSWORD,
       };
 
       try {
