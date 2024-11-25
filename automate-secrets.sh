@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 set -e  # Exit on errors
 set -x  # Debugging logs
