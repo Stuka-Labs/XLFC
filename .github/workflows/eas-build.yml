@@ -1,4 +1,4 @@
-name: EAS Build
+name: Automate EAS Secrets and Build
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build with EAS
+  automate-and-build:
+    name: Automate Secrets and Build
     runs-on: ubuntu-latest
 
     steps:
@@ -19,21 +19,29 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
 
       # Step 3: Install Dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 4: Install CocoaPods
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
-
-      # Step 5: Install EAS CLI
+      # Step 4: Install EAS CLI
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # Step 6: Run EAS Build
+      # Step 5: Encode GoogleService-Info.plist
+      - name: Encode GoogleService-Info.plist
+        run: base64 GoogleService-Info.plist > GoogleServiceInfo.b64
+
+      # Step 6: Create EAS Secret
+      - name: Create EAS Secret
+        run: |
+          eas env:create --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project
+          eas env:list
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      # Step 7: Run EAS Build
       - name: Run EAS Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
