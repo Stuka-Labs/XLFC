@@ -1,4 +1,4 @@
-name: Automate EAS Secrets and Build
+name: EAS Build Workflow
 
 on:
   push:
