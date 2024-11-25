@@ -27,7 +27,7 @@ fi
 # eas env:delete --variable-name GOOGLE_SERVICE_INFO_PLIST --non-interactive || echo "No existing variable to delete."
 
 # Step 5: Create the environment variable
-eas env:create --variable-name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive --environment production
+eas env:create production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive
 
 # Step 6: Verify the variable
 eas env:list production

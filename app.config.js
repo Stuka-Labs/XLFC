@@ -1,15 +1,17 @@
+import 'dotenv/config';
+
 export default {
     expo: {
         name: "XLFC",
         slug: "XLFC",
-        "scheme": "xlfc",
+        scheme: "xlfc",
         ios: {
-            googleServicesFile: './GoogleService-Info.plist',
+            googleServicesFile: process.env.GOOGLE_SERVICE_INFO_PLIST_PATH || './GoogleService-Info.plist',
         },
-        "extra": {
-            "eas": {
-                "projectId": "5a5b1fa7-78ad-49d8-9758-76ba0b79c7a2"
-            }
+        extra: {
+            eas: {
+                projectId: "5a5b1fa7-78ad-49d8-9758-76ba0b79c7a2",
+            },
         },
-    }
-}
+    },
+};
