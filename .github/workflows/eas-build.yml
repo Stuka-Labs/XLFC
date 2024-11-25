@@ -21,18 +21,19 @@ jobs:
         with:
           node-version: 16
 
-      # Step 3: Install EAS CLI
+      # Step 3: Install Dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # Step 4: Install EAS CLI
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      - name: Debug EAS_TOKEN
-        run: echo "EAS_TOKEN=$EAS_TOKEN"
-        env:
-          EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
-              
-
-      # Step 4: Trigger EAS Build
+      # Step 5: Run EAS Build
       - name: Run EAS Build
         env:
-          EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: eas build --platform ios --non-interactive
