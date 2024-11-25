@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e  # Exit on errors
-set -x  # Debugging logs
+# set -x  # Debugging logs
 
 # Step 1: Encode the plist file
 if [ ! -f GoogleService-Info.plist ]; then
