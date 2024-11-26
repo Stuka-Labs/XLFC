@@ -13,6 +13,12 @@
       ],
       "@/components": [
         "./components"
+      ],
+      "@/context": [
+        "./context"
+      ],
+      "@/assets": [
+        "./assets"
       ]
     }
   },

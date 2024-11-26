@@ -69,7 +69,7 @@ const RegisterScreen = () => {
       // Redirect user based on account type
       await defaults.get(
         "userInfo",
-        null,
+        currentUser,
         setInProgress,
         async (response) => {
           if (!response.account) {

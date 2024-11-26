@@ -11,7 +11,7 @@ import ButtonPrimary from "../../components/buttons/ButtonPrimary";
 import images from "../../assets/images";
 import defaults from "../../lib/defaults";
 import { useAuth } from "../../context/authContext";
-
+import PasswordInput from "@/components/inputs/PasswordInput";
 import * as Google from "expo-auth-session/providers/google";
 
 const LoginScreen = () => {
@@ -30,7 +30,7 @@ const LoginScreen = () => {
     try {
       setInProgress(true);
 
-      console.log('logging in in login.tsx ' + email + ' ' + password);
+      console.log("logging in in login.tsx " + email + " " + password);
       // Log in the user immediately after successful registration
       const maybeUser = await login(email, password);
 
@@ -47,7 +47,7 @@ const LoginScreen = () => {
       if (maybeUser) {
         defaults.get(
           "userInfo",
-          {},
+          currentUser,
           setInProgress,
           async (response) => {
             if (!response.account) {
@@ -136,6 +136,7 @@ const LoginScreen = () => {
         <Text className="text-2xl font-semibold text-center mt-4 mb-8">
           Welcome to the XLFC App!
         </Text>
+
         <DefaultInput
           label="Email"
           style="mx-4 my-3"
@@ -151,28 +152,7 @@ const LoginScreen = () => {
             />
           }
         />
-        <DefaultInput
-          label="Password"
-          style="mx-4 my-3"
-          placeholder="Enter Password"
-          text={password}
-          setText={setPassword}
-          secureTextEntry={true}
-          leftView={
-            <Image
-              source={images.inputs.lock}
-              className="w-[20] h-[31]"
-              resizeMode="cover"
-            />
-          }
-          rightView={
-            <Image
-              source={images.inputs.eye}
-              className="w-[20] h-[31]"
-              resizeMode="contain"
-            />
-          }
-        />
+        <PasswordInput value={password} />
         <View className="flex items-end">
           <Text
             className="underline text-gray-400 mx-4"

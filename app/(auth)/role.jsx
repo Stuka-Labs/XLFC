@@ -22,19 +22,19 @@ const RoleScreen = () => {
   const accounts = [
     {
       account: "player",
-      subTitle: "Lorem Ipsum is simply dummy text.",
+      subTitle: "",
       image: images.dummy.player,
       endpoint: "assignUserAsPlayer",
     },
     {
       account: "coach",
-      subTitle: "Lorem Ipsum is simply dummy text.",
+      subTitle: "",
       image: images.dummy.manager,
       endpoint: "assignUserAsCoach",
     },
     {
       account: "admin",
-      subTitle: "Lorem Ipsum is simply dummy text.",
+      subTitle: "",
       image: images.dummy.admin,
       endpoint: "createAdmin",
     },
