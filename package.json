@@ -10,8 +10,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "dev": "npx expo start",
-    "eas-build-pre-install": "echo \"$GOOGLE_SERVICE_INFO_PLIST\" | base64 --decode > ./GoogleService-Info.plist"
+    "dev": "npx expo start"
   },
   "jest": {
     "preset": "jest-expo"
