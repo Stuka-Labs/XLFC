@@ -9,102 +9,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import auth from "@react-native-firebase/auth";
 import env from "@/env";
 
-// import { setupNotifications } from '../lib/notification.js'
-
-const request = async (
-  endpoint: string,
-  method: string,
-  params:
-    | string
-    | string[][]
-    | Record<string, string>
-    | URLSearchParams
-    | undefined,
-  setInProgress: (arg0: boolean) => void,
-  callback: (arg0: any) => void,
-  failed: () => any,
-  auth_token: any,
-  fullUrl: string
-) => {
-  const url =
-    fullUrl ??
-    (env.API_DOMAIN_WITH_ENDPOINT
-      ? env.API_DOMAIN_WITH_ENDPOINT(endpoint) + `?`
-      : "");
-  if (setInProgress) setInProgress(true);
-  const token = auth_token ?? (await AsyncStorage.getItem("auth_token")) ?? "";
-  console.log("token from defaults.request", token);
-  // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkcml2ZXJJZCI6IjY1NzNlYzhjNTAwMTdiN2NiNzU0OTZkMCIsInVzZXJJZCI6IjY1NTY5NjI1NDQyNWY2MWI0MzI4YmMzNCIsImlhdCI6MTcxNjM0ODIwMn0.TeYhdPyRPXr333rUQnBU_syQA8ZydqRyj4OhGuLF5T4'
-
-  try {
-    const response = await fetch(
-      url + new URLSearchParams(method == "GET" ? params : {}),
-      {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          // 'Authorization': `Bearer ${token}`
-          Authorization: token,
-        },
-        body: method == "POST" ? JSON.stringify(params) : null,
-      }
-    );
-
-    if (setInProgress) setInProgress(false);
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      // response.text().then(async (text) => {
-      //   if (response.status == 501 && text == 'sign-out'){
-      //     // AsyncStorage.removeItem('auth_token')
-      //     analytics.logEvent('log_out', {
-      //       from: 'server'
-      //     })
-      //     analytics.initUser(null)
-      //     return logOut()
-      //   }
-
-      //   Alert.alert('Error', text, [ { text: 'Okay' }], { cancelable: true })
-      // })
-      if (failed) return failed();
-
-      if (data.message)
-        Alert.alert("Error", data.message, [{ text: "Okay" }], {
-          cancelable: true,
-        });
-
-      return;
-    }
-
-    console.log("Data", data);
-    // You can save data to AsyncStorage, Redux store, or any state management solution here
-    // console.log('Sign-in successful', data);
-
-    if (callback) callback(data);
-
-    // Example: Saving data to AsyncStorage (if required)
-    // await AsyncStorage.setItem('userToken', data.token);
-
-    // return data
-  } catch (err) {
-    const errorMessage =
-      (err as any).response?.data ?? (err as any).message ?? err;
-    console.log("Error", errorMessage, url);
-    // return { err_message: err.message || err }
-    // return { err_message: errorMessage }
-    Alert.alert("Error", errorMessage, [{ text: "Okay" }], {
-      cancelable: true,
-    });
-  }
-};
-
 const post = async (
   endpoint: string,
   params: { token: string },
   setInProgress: ((arg0: boolean) => any) | null,
   callback: { (response: any): Promise<void>; (arg0: any): any },
-  failed: { (): Promise<void>; (arg0: unknown): any } = async () => Promise.resolve(),
+  failed: { (): Promise<void>; (arg0: unknown): any } = async () =>
+    Promise.resolve(),
   token: string | null | undefined,
   fullUrl: string | undefined
 ) => {
@@ -113,8 +24,8 @@ const post = async (
     (env.API_DOMAIN_WITH_ENDPOINT
       ? env.API_DOMAIN_WITH_ENDPOINT(endpoint)
       : ""); // Determine the URL
-  const authToken = token ?? (await AsyncStorage.getItem("auth_token")); // Fetch token if not provided
-  console.log("url from post", url);
+  const authToken = token;
+  console.log("token from defaults.jsx ", authToken || "");
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -198,41 +109,6 @@ const get = async (
     setInProgress && setInProgress(false);
   }
 };
-
-// const upload = async (uri: any, directory: any, setInProgress: (arg0: boolean) => void, progressHandler: (arg0: number) => void, completed: (arg0: any) => void, failed: (arg0: any) => void) => {
-//   if (setInProgress) setInProgress(true)
-
-//   const formData = new FormData()
-//   const mimeType = mime.getType(uri)
-//   const url = `${env.API_DOMAIN}upload/file?directory=${directory}`
-
-//   formData.append('file', {
-//     uri: uri,
-//     name: uuidv4(),
-//     type: mimeType
-//   })
-
-//   try {
-//     const response = await axios.post(url, formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data'
-//       },
-//       onUploadProgress: (progressEvent) => {
-//         // const progressPercent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-//         const progress = progressEvent.total ? progressEvent.loaded / progressEvent.total : 0
-//         if (progressHandler) progressHandler(progress)
-//         // setProgress(progressPercent);
-//       }
-//     })
-
-//     if (setInProgress) setInProgress(false)
-
-//     completed(response.data.fileName)
-//   } catch (error) {
-//     if (setInProgress) setInProgress(false)
-//     if (failed) failed((error as any).response?.data ?? (error as any).message ?? error)
-//   }
-// }
 
 const simpleAlert = (
   title: string,
