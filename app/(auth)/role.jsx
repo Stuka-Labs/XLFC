@@ -67,15 +67,14 @@ const RoleScreen = () => {
     }
   }
 
-  async function setAccountType() {
-    console.log("setting account type!");
-    if (!selectedAccount) {
+  async function setAccountType(account) {
+    if (!account) {
       return defaults.simpleAlert("Error", "Please select your role");
     }
 
     const auth_token = await AsyncStorage.getItem("auth_token");
-    const account = accounts.find((a) => a.account === selectedAccount);
-    console.log("Account:", account);
+
+    console.log("Account:", account.account);
     if (!account) {
       console.error("No matching account found for selected role.");
       return;
@@ -89,7 +88,7 @@ const RoleScreen = () => {
         try {
           console.log("Response:", response); // Debug the raw response
           await AsyncStorage.setItem("account", account.account);
-          router.replace("/");
+          router.replace("/more-info");
         } catch (err) {
           console.error("Error processing response:", err);
         }
@@ -99,8 +98,6 @@ const RoleScreen = () => {
       }, // Failed callback
       auth_token // Auth token
     );
-
-
   }
 
   const handleLogout = async () => {
@@ -112,6 +109,12 @@ const RoleScreen = () => {
       console.error("Error logging out:", error);
     }
   };
+
+  async function handleRoleSelect(account) {
+    console.log("Selected Account:", account);
+    setSelectedAccount(account);
+    await setAccountType(account);
+  }
 
   return (
     <GestureHandlerRootView>
@@ -135,7 +138,9 @@ const RoleScreen = () => {
                 borderColor:
                   account.account == selectedAccount ? "blue" : "#E4E4E4",
               }}
-              onPress={() => setSelectedAccount(account.account)}
+              onPress={() => {
+                handleRoleSelect(account);
+              }}
             >
               <View className="flex-1 space-y-2">
                 <Text className="text-xl font-bold capitalize">

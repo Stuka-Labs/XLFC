@@ -99,7 +99,6 @@ const HomeScreen = () => {
       teamData,
       null,
       async (response) => {
-        console.log("Team added successfully via defaults:", response.data.uid);
         setTeams((prevTeams) => [...prevTeams, response.data]);
       },
       async (error) => {
@@ -132,9 +131,9 @@ const HomeScreen = () => {
       if (!user) return;
       setDisplayName(user.displayName);
       setPhotoUrl(user.photoURL);
-      if (teams.length === 0) {
-        await addTeamRecord();
-      }
+      // if (teams.length === 0) {
+      //   await addTeamRecord();
+      // }
     }
     init();
   }, [user]);

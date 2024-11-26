@@ -210,7 +210,7 @@ const LoginScreen = () => {
           }
         />
         {!env.IS_PROD && (
-          <View className="flex flex-row items-center mx-4 my-3">
+          <View className="flex flex-row items-center justify-center mx-4 my-3">
             <Checkbox
               value={autoCreate}
               onValueChange={(newValue) => {
