@@ -1,4 +1,11 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useFocusEffect, router } from "expo-router";
@@ -11,13 +18,81 @@ import images from "../../assets/images";
 import defaults from "../../lib/defaults";
 import LogoutIcon from "../../components/buttons/LogoutIcon";
 import { useState, useEffect, useCallback } from "react";
+import env from "@/env";
 
 const RoleScreen = () => {
   const { login, logout, user, auth } = useAuth();
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [inProgress, setInProgress] = useState(false);
-  const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [players, setPlayers] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  const [displayName, setDisplayName] = useState("");
+
+  // useEffect(() => {
+  //   async function updateUserData() {
+  //     try {
+  //       console.log("[role.jsx] now should be updating the user!");
+  //       const email = await AsyncStorage.getItem("email");
+  //       const surName = await AsyncStorage.getItem("surName");
+  //       const firstName = await AsyncStorage.getItem("firstName");
+  //       const phoneNumber = await AsyncStorage.getItem("phoneNumber");
+  //       const emailVerified = await AsyncStorage.getItem("emailVerified");
+  //       // const phoneNumber = await AsyncStorage.getItem("phoneNumber");
+  //       const updatedObj = { email, firstName, surName, phoneNumber, emailVerified };
+  //       console.log("[role.jsx] updatedObj", updatedObj);
+
+  //       // const idToken = await auth.currentUser.getIdToken(true);
+  //       // console.log("[role.jsx] idToken from role page: ", idToken);
+  //       // AsyncStorage.setItem("auth_token", idToken);
+  //       // // Save data locally
+  //       // await AsyncStorage.multiSet([
+  //       //   ["surName", surName],
+  //       //   ["firstName", firstName],
+  //       //   ["phoneNumber", phoneNumber],
+  //       //   ["auth_token", idToken],
+  //       // ]);
+
+  //       const baseUrl = env.API_DOMAIN_WITH_ENDPOINT("updateUser");
+  //       const url = `${baseUrl}${user?.uid}`;
+
+  //       console.log("Update URL:", url);
+  //       const authToken = await auth.currentUser.getIdToken(true);
+  //       const newData = updatedObj;
+  //       AsyncStorage.setItem("auth_token", authToken);
+  //       if (!authToken) {
+  //         Alert.alert(
+  //           "Error",
+  //           "You need to be logged in to update your account."
+  //         );
+  //         return;
+  //       }
+
+  //       const response = await fetch(url, {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${authToken}`,
+  //         },
+  //         body: JSON.stringify(newData),
+  //       });
+
+  //       console.log("[role.jsx] response: ", response);
+  //       if (response.ok) {
+  //         console.log("Account successfully updated");
+  //         // Alert.alert("Success", "Your account has been updated.");
+  //         await refresh(); // Refresh user data after update
+  //       } else {
+  //         const errorText = await response.text();
+  //         console.error("Failed to update account:", errorText);
+  //         Alert.alert("Error", "Failed to update account. Try again.");
+  //       }
+  //     } catch (err) {
+  //       console.error("Error updating account:", err);
+  //       Alert.alert("Error", "An unexpected error occurred.");
+  //     }
+  //   }
+  //   updateUserData();
+  // }, []);
 
   const accounts = [
     {
@@ -43,12 +118,14 @@ const RoleScreen = () => {
   useFocusEffect(
     useCallback(() => {
       refresh();
-    }, [auth, user])
+    }, [])
   );
 
   async function refresh() {
     if (!auth || !user) return;
-    console.log('Getting account Type...');
+    console.log("Getting account Type...");
+    const storedName = await AsyncStorage.getItem("displayName");
+    setDisplayName(storedName || user?.displayName || "");
     await getAccountType();
   }
 
@@ -61,6 +138,7 @@ const RoleScreen = () => {
   }
 
   async function setAccountType() {
+    console.log('setting account type!')
     if (!selectedAccount) {
       return defaults.simpleAlert("Error", "Please select your role");
     }

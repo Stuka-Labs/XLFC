@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { fileTypeFromFile } from 'file-type'
 // import mime from 'mime'
 // import auth from "@react-native-firebase/auth";
-import env from "./env";
+import env from "@/env";
 
 // import { setupNotifications } from '../lib/notification.js'
 
@@ -104,7 +104,7 @@ const post = async (
   params: { token: string },
   setInProgress: ((arg0: boolean) => any) | null,
   callback: { (response: any): Promise<void>; (arg0: any): any },
-  failed: { (): Promise<void>; (arg0: unknown): any },
+  failed: { (): Promise<void>; (arg0: unknown): any } = async () => Promise.resolve(),
   token: string | null | undefined,
   fullUrl: string | undefined
 ) => {
@@ -188,7 +188,7 @@ const get = async (
       console.info("GET Request Success:", { endpoint, params, data });
       callback && callback(data);
     } else {
-      console.log("GET Request Failed:", { endpoint, params, data });
+      // console.log("GET Request Failed:", { endpoint, params, data });
       failed && failed(data);
     }
   } catch (error) {

@@ -8,13 +8,22 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DefaultInput from "../../components/inputs/DefaultInput";
 import TopNavAction from "../../components/main/TopNavAction";
 import ButtonPrimary from "../../components/buttons/ButtonPrimary";
-import env from "../../lib/env";
+import env from "@/env";
 import ArrowDown from "../../assets/images/nav/arrow-down.svg";
 import images from "../../assets/images";
 import { useAuth } from "../../context/authContext";
 import defaults from "../../lib/defaults";
 import PasswordInput from "@/components/inputs/PasswordInput";
 
+const predefinedUser = {
+  firstName: "Bob",
+  surName: "Loblaw",
+  email: "bobloblaw@gmail.com",
+  displayName: "Bob Loblaw",
+  phoneNumber: env.TEST_PHONE,
+  password: env.TEST_PASSWORD,
+  emailVerified: "true",
+};
 
 const RegisterScreen = () => {
   const { register, login, logout, user, auth } = useAuth();
@@ -23,20 +32,25 @@ const RegisterScreen = () => {
   const [surName, setSurName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [email, setEmail] = useState();
-  const [phoneNumber, setPhoneNumber] = useState(
-    !env.IS_PROD ? env.USER_PHONE : ""
-  );
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inProgress, setInProgress] = useState(false);
   const [autoCreate, setAutoCreate] = useState(false);
 
   const handleRegister = async () => {
-    console.log("IS_PROD from register.jsx", process.env.IS_PROD);
-    if (
-      process.env.IS_PROD &&
-      (!email || !password || password !== confirmPassword)
-    ) {
+    if (autoCreate) {
+      console.log('[register.tsx] exiting handleRegister')
+      return;
+    }
+    await AsyncStorage.multiSet([
+      ["email", email],
+      ["surName", surName],
+      ["firstName", firstName],
+      ["phoneNumber", phoneNumber],
+    ]);
+
+    if (env.IS_PROD && (!email || !password || password !== confirmPassword)) {
       defaults.simpleAlert(
         "Validation Error",
         !email || !password
@@ -60,22 +74,16 @@ const RegisterScreen = () => {
 
       // Register the user
       await register(email, password, firstName, surName, phoneNumber);
-      console.log(
-        "email and password from register.tsx being sent to authContext login " +
-          email +
-          " " +
-          password
-      );
+
       // Log in the user immediately after successful registration
       await login(email, password);
 
       const currentUser = auth?.currentUser;
       if (!currentUser) throw new Error("Failed to retrieve logged-in user.");
 
-      const idToken = await currentUser.getIdToken(true);
-
       console.log("User registered and logged in successfully.");
 
+      const idToken = await currentUser.getIdToken(true);
       // Redirect user based on account type
       await defaults.get(
         "userInfo",
@@ -92,37 +100,30 @@ const RegisterScreen = () => {
         null,
         `${idToken}`
       );
-
-      // Save data locally
-      await AsyncStorage.multiSet([
-        ["auth_token", idToken],
-        ["email", email],
-        ["first_name", firstName],
-        ["sur_name", surName],
-      ]);
     } catch (error) {
       console.error("Registration Error:", error);
       defaults.simpleAlert("Error", error.message || "Failed to register.");
       await logout(); // Ensure user is logged out on failure
     } finally {
-      setInProgress(false); // Reset the progress state
+      setInProgress(false);
     }
   };
 
   const handleAutoCreate = async () => {
     if (!autoCreate) {
-      const predefinedUser = {
-        firstName: "Bob",
-        surName: "Loblaw",
-        email: "bobloblaw@gmail.com",
-        phoneNumber: process.env.TEST_PHONE,
-        password: process.env.TEST_PASSWORD,
-      };
-
+      console.log('[register.tsx] starting handleAutoCreate')
       try {
         setInProgress(true);
-        console.log(`email from handleCreate: ${predefinedUser.email}`);
-        console.log(`password from handleCreate: ${predefinedUser.password}`);
+        // Save data locally
+        await AsyncStorage.multiSet([
+          ["email", predefinedUser.email],
+          ["surName", predefinedUser.surName],
+          ["firstName", predefinedUser.firstName],
+          ["phoneNumber", predefinedUser.phoneNumber],
+          ["displayName", predefinedUser.displayName],
+          ["emailVerified", predefinedUser.emailVerified],
+        ]);
+
         await register(
           predefinedUser.email,
           predefinedUser.password,
@@ -153,24 +154,11 @@ const RegisterScreen = () => {
             }
             console.log("response", response);
             await AsyncStorage.setItem("account", response.accountType);
-            await AsyncStorage.multiSet([
-              ["auth_token", idToken],
-              ["email", email],
-              ["firstName", firstName],
-              ["surName", surName],
-            ]);
             router.replace("/");
           },
           null,
           `${idToken}`
         );
-
-        // await AsyncStorage.multiSet([
-        //   ["auth_token", idToken],
-        //   ["email", email],
-        //   ["firstName", firstName],
-        //   ["surName", surName],
-        // ]);
       } catch (error) {
         console.error("Registration Error:", error);
         defaults.simpleAlert("Error", error.message || "Failed to register.");

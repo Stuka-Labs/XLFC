@@ -1,13 +1,13 @@
 // app/(auth)/login.jsx
 import { View, Text, Image } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import Checkbox from "@/components/inputs/Checkbox";
 import DefaultInput from "../../components/inputs/DefaultInput";
 import ButtonPrimary from "../../components/buttons/ButtonPrimary";
-
+import env from "@/env";
 import images from "../../assets/images";
 import defaults from "../../lib/defaults";
 import { useAuth } from "../../context/authContext";
@@ -25,24 +25,40 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [inProgress, setInProgress] = useState(false);
+  const [autoCreate, setAutoCreate] = useState(false);
+
+
+  useEffect(() => {
+    async function getEmailAndPassword() {
+      const storedEmail = await AsyncStorage.getItem("email");
+      const storedPassword = await AsyncStorage.getItem("password");
+      if (storedEmail && storedEmail !== "") {
+        console.log("[login.jsx] setting storedEmail", storedEmail);
+        setEmail(storedEmail);
+      }
+      if (storedPassword && storedPassword !== "") {
+        console.log("[login.jsx] setting storedPassword ", storedPassword);
+        setPassword(storedPassword);
+      }
+    }
+    getEmailAndPassword();
+  }, []);
 
   async function handleLogin() {
     try {
       setInProgress(true);
 
-      console.log("logging in in login.tsx " + email + " " + password);
-      // Log in the user immediately after successful registration
       const maybeUser = await login(email, password);
 
       console.log("maybeUser: ", maybeUser?.email || "No user found");
 
       const currentUser = auth?.currentUser;
       if (!currentUser) throw new Error("Failed to retrieve logged-in user.");
-      console.log("User logged in successfully.");
+
       const idToken = await auth.currentUser.getIdToken(true);
       // console.log("[Client] Refreshed ID Token:", idToken);
       await AsyncStorage.setItem("auth_token", idToken);
-      await AsyncStorage.setItem("email", email);
+      // await AsyncStorage.setItem("email", email);
 
       if (maybeUser) {
         defaults.get(
@@ -55,15 +71,19 @@ const LoginScreen = () => {
               return router.replace("/role");
             }
             console.log("Account found, setting async storage");
+            console.log(
+              "firstName after login in login.jsx",
+              response.firstName
+            );
             await AsyncStorage.setItem("first_name", response.first_name);
             await AsyncStorage.setItem("sur_name", response.sur_name);
             await AsyncStorage.setItem("account", response.account);
+            await AsyncStorage.setItem("password", password);
             return router.replace("/");
           },
           null,
           `${idToken}`
         );
-        // return router.push("/role");
       }
     } catch (error) {
       // Use the alert to display the error message
@@ -129,6 +149,11 @@ const LoginScreen = () => {
     }
   }
 
+  function handleUseTestUser() {
+    setEmail("bobloblaw@gmail.com")
+    setPassword("G9&kL!zX2@Yt~")
+  }
+
   return (
     <SafeAreaView className="bg-white">
       <View className="h-full flex flex-col justify-center">
@@ -184,6 +209,20 @@ const LoginScreen = () => {
             <Image source={images.socials.google} className="w-[28] h-[28]" />
           }
         />
+        {!env.IS_PROD && (
+          <View className="flex flex-row items-center mx-4 my-3">
+            <Checkbox
+              value={autoCreate}
+              onValueChange={(newValue) => {
+                setAutoCreate(newValue);
+                if (newValue) {
+                  handleUseTestUser();
+                }
+              }}
+            />
+            <Text className="ml-2">Use Test User</Text>
+          </View>
+        )}
         <Text className="text-center">
           Don't have an account?{" "}
           <Text
