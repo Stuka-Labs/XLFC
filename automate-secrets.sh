@@ -30,7 +30,7 @@ if [ ! -f eas.json ]; then
 fi
 
 # Step 5: Create the EAS secret
-eas env:create --environment production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive --non-interactive --log debug
+eas env:create --environment production --name GOOGLE_SERVICE_INFO_PLIST --type file --value ./GoogleServiceInfo.b64 --scope project --visibility sensitive --non-interactive
 
 # Step 6: Verify the variable
 eas env:list production

@@ -13,6 +13,8 @@ import ArrowDown from "../../assets/images/nav/arrow-down.svg";
 import images from "../../assets/images";
 import { useAuth } from "../../context/authContext";
 import defaults from "../../lib/defaults";
+import PasswordInput from "@/components/inputs/PasswordInput";
+
 
 const RegisterScreen = () => {
   const { register, login, logout, user, auth } = useAuth();
@@ -30,8 +32,11 @@ const RegisterScreen = () => {
   const [autoCreate, setAutoCreate] = useState(false);
 
   const handleRegister = async () => {
-    console.log('IS_PROD from register.jsx', process.env.IS_PROD);
-    if (process.env.IS_PROD && (!email || !password || password !== confirmPassword)) {
+    console.log("IS_PROD from register.jsx", process.env.IS_PROD);
+    if (
+      process.env.IS_PROD &&
+      (!email || !password || password !== confirmPassword)
+    ) {
       defaults.simpleAlert(
         "Validation Error",
         !email || !password
@@ -55,7 +60,12 @@ const RegisterScreen = () => {
 
       // Register the user
       await register(email, password, firstName, surName, phoneNumber);
-      console.log('email and password from register.tsx being sent to authContext login ' + email + ' ' + password);
+      console.log(
+        "email and password from register.tsx being sent to authContext login " +
+          email +
+          " " +
+          password
+      );
       // Log in the user immediately after successful registration
       await login(email, password);
 
@@ -104,7 +114,7 @@ const RegisterScreen = () => {
       const predefinedUser = {
         firstName: "Bob",
         surName: "Loblaw",
-        email: process.env.TEST_USER,
+        email: "bobloblaw@gmail.com",
         phoneNumber: process.env.TEST_PHONE,
         password: process.env.TEST_PASSWORD,
       };
@@ -125,9 +135,11 @@ const RegisterScreen = () => {
         const currentUser = auth?.currentUser;
         if (!currentUser) throw new Error("Failed to retrieve logged-in user.");
         const idToken = await currentUser.getIdToken(true);
-        console.log('currentUser', currentUser);
+        console.log("currentUser", currentUser);
         console.log(`email from handleAutoCreate: ${predefinedUser.email}`);
-        console.log(`password from handleAutoCreate: ${predefinedUser.password}`);
+        console.log(
+          `password from handleAutoCreate: ${predefinedUser.password}`
+        );
 
         console.log("User registered and logged in successfully.");
 
@@ -226,21 +238,10 @@ const RegisterScreen = () => {
               </View>
             }
           />
-          <DefaultInput
-            label="Password"
-            style="mx-4 my-3"
-            placeholder="Enter Password"
-            text={password}
-            setText={setPassword}
-            secureTextEntry={true}
-          />
-          <DefaultInput
-            label="Confirm Password"
-            style="mx-4 my-3"
-            placeholder="Enter Password Again"
-            text={confirmPassword}
-            setText={setConfirmPassword}
-            secureTextEntry={true}
+          <PasswordInput value={password} onChangeText={setPassword} />
+          <PasswordInput
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
           {!env.IS_PROD && (
             <View className="flex flex-row items-center mx-4 my-3">
