@@ -31,8 +31,6 @@ const DisplayNameInput = ({ value, onChangeText }) => {
         fontSize: 18,
         fontWeight: "bold",
         color: "white",
-        borderBottomWidth: 1,
-        borderBottomColor: "#FFFFFF",
         paddingVertical: 4,
       }}
     />
@@ -59,7 +57,7 @@ const PhotoUrlInput = ({ value, onChangeText, onClear }) => {
         style={{
           fontSize: 14,
           color: "white",
-          flex: 1, // Allow input to take remaining space
+          flex: 1,
         }}
       />
       {value !== "" && (
@@ -80,14 +78,12 @@ const HomeScreen = () => {
   const [account, setAccount] = useState(null);
   const [displayName, setDisplayName] = useState(null);
   const [photoURL, setPhotoUrl] = useState(null);
-
+  const [showPhotoInput, setShowPhotoInput] = useState(false); // New state
 
   useEffect(() => {
     if (!user) return;
-    const displayName = user.displayName;
-    const photoURL = user.photoURL;
-    setDisplayName(displayName);
-    setPhotoUrl(photoURL);
+    setDisplayName(user.displayName);
+    setPhotoUrl(user.photoURL);
   }, [user]);
 
   async function refresh() {
@@ -123,34 +119,6 @@ const HomeScreen = () => {
       );
     }
   }
-
-  const handleSetDisplayName = async (value) => {
-    if (user && auth) {
-      try {
-        await updateProfile(user, { displayName: value });
-        console.log("Firebase Auth displayName updated to:", value);
-
-        setDisplayName(value);
-        await AsyncStorage.setItem("displayName", value);
-      } catch (error) {
-        console.error("Error updating displayName:", error);
-      }
-    }
-  };
-
-  const handleSetPhotoUrl = async (value) => {
-    if (user && auth) {
-      try {
-        await updateProfile(user, { photoURL: value });
-        console.log("Firebase Auth photoURL updated to:", value);
-
-        setPhotoUrl(value);
-        await AsyncStorage.setItem("photoURL", value);
-      } catch (error) {
-        console.error("Error updating photoURL:", error);
-      }
-    }
-  };
 
   async function logOut() {
     await AsyncStorage.clear();
@@ -206,27 +174,49 @@ const HomeScreen = () => {
     );
   }
 
-  async function handleClearPhotoUrl() {
-    const newData = {
-      photoURL: "",
-    };
-    const currentUser = auth.currentUser;
+  const handleSetDisplayName = async (value) => {
+    if (user && auth) {
+      try {
+        await updateProfile(user, { displayName: value });
+        console.log("Firebase Auth displayName updated to:", value);
 
-    if (currentUser) {
-      updateProfile(currentUser, {
-        photoURL: "",
-      })
-        .then(() => {
-          console.log("Photo URL successfully cleared");
-          setPhotoUrl(null);
-        })
-        .catch((error) => {
-          // An error occurred
-          console.error(error);
-        });
+        setDisplayName(value);
+        await AsyncStorage.setItem("displayName", value);
+      } catch (error) {
+        console.error("Error updating displayName:", error);
+      }
     }
-  }
+  };
 
+  const handleSetPhotoUrl = async (value) => {
+    if (user && auth) {
+      try {
+        await updateProfile(user, { photoURL: value });
+        console.log("Firebase Auth photoURL updated to:", value);
+
+        setPhotoUrl(value);
+        await AsyncStorage.setItem("photoURL", value);
+        setShowPhotoInput(false); // Hide the input after updating
+      } catch (error) {
+        console.error("Error updating photoURL:", error);
+      }
+    }
+  };
+
+  const handleClearPhotoUrl = async () => {
+    if (user && auth) {
+      try {
+        await updateProfile(user, { photoURL: "" });
+        console.log("Photo URL successfully cleared");
+
+        setPhotoUrl(null);
+        await AsyncStorage.removeItem("photoURL");
+        setShowPhotoInput(false); // Hide the input after clearing
+      } catch (error) {
+        console.error("Error clearing photoURL:", error);
+      }
+    }
+  };
   return (
     <GestureHandlerRootView>
       <View
@@ -239,23 +229,30 @@ const HomeScreen = () => {
           resizeMode="contain"
         />
         <View className="flex flex-row items-center mx-4 mb-4">
-          <Image
-            source={photoURL ? { uri: photoURL } : admin}
-            className="h-[52] w-[52] rounded-full"
-          />
-
-          <View className="mx-4 flex-1">
-            <Text className="text-white">Hello,</Text>
-            <DisplayNameInput
-              value={displayName || ""}
-              onChangeText={handleSetDisplayName}
+          {/* Profile Image */}
+          <TouchableOpacity
+            onPress={() => setShowPhotoInput(true)} // Show input on image click
+          >
+            <Image
+              source={photoURL ? { uri: photoURL } : admin}
+              className="h-[52] w-[52] rounded-full"
             />
+          </TouchableOpacity>
+          <View className="mx-4 flex-1">
+          <Text className="text-white">Hello,</Text>
+          <DisplayNameInput
+            value={displayName || ""}
+            onChangeText={(value) => setDisplayName(value)}
+          />
+          {/* Conditionally show the photo URL input */}
+          {showPhotoInput && (
             <PhotoUrlInput
               value={photoURL || ""}
               onChangeText={handleSetPhotoUrl}
               onClear={handleClearPhotoUrl}
             />
-          </View>
+          )}
+        </View>
           <TouchableOpacity
             className="w-[42] h-[42] rounded-xl border-[1px] border-[#FFFFFF] flex items-center justify-center"
             onPress={logOut}
