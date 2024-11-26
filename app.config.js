@@ -35,7 +35,13 @@ export default {
       eas: {
         projectId: "5a5b1fa7-78ad-49d8-9758-76ba0b79c7a2",
       },
-      apiUrl: process.env.API_URL, // Example environment variable
+      apiUrl: process.env.API_URL,
+      DEV_API_DOMAIN: process.env.DEV_API_DOMAIN,
+      PROD_API_DOMAIN: process.env.PROD_API_DOMAIN,
+      DEV_APP_NAME: process.env.DEV_APP_NAME,
+      PROD_APP_NAME: process.env.PROD_APP_NAME,
+      DEV_USER_EMAIL: process.env.DEV_USER_EMAIL,
+      DEV_USER_PASSWORD: process.env.DEV_USER_PASSWORD,
     },
   },
 };

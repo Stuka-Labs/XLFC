@@ -17,26 +17,26 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-
+console.log("app?.options?.projectId", app?.options?.projectId);
 // Initialize Auth with AsyncStorage for React Native
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-const firestore = getFirestore(app);
+const firestore = getFirestore();
 const functions = getFunctions(app);
 
-// if (process.env.NODE_ENV === "development") {
-//   const emulatorHost = "127.0.0.1";
-//   console.log("Connecting to emulator at:", emulatorHost);
+if (process.env.NODE_ENV === "development") {
+  const emulatorHost = "127.0.0.1";
+  console.log("Connecting to emulator at:", emulatorHost);
 
-//   // connectAuthEmulator(auth, `http://${emulatorHost}:9199`);
-//   // connectFirestoreEmulator(firestore, emulatorHost, 8080);
-//   // connectFunctionsEmulator(functions, emulatorHost, 5002);
+  // connectAuthEmulator(auth, `http://${emulatorHost}:9199`);
+  // connectFirestoreEmulator(firestore, emulatorHost, 8080);
+  // connectFunctionsEmulator(functions, emulatorHost, 5002);
 
-//   addDoc(collection(firestore, "test"), { message: "Hello World!" })
-//     .then((docRef) => console.log("Document written with ID:", docRef.id))
-//     .catch((error) => console.error("Error adding document:", error));
-// }
+  addDoc(collection(firestore, "test"), { message: "Hello World!" })
+    .then((docRef) => console.log("Document written with ID:", docRef.id))
+    .catch((error) => console.error("Error adding document:", error));
+}
 
 export { app, auth, firestore, functions };

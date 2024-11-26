@@ -1,3 +1,4 @@
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Image,
   View,
@@ -5,43 +6,128 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  TextInput,
 } from "react-native";
-import { useState, useCallback } from "react";
 import { useFocusEffect, router } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../context/authContext";
-
 import images from "../../assets/images";
-import defaults from "../../lib/defaults";
-import env from "../../lib/env";
+import defaults from "@/lib/defaults";
+import env from "@/env";
+import { updateProfile } from "firebase/auth";
+import admin from "@/assets/images/dummy/role_admin.png";
+import { firestore } from "@/app/firebaseconfig";
+import { doc, onSnapshot, setDoc, getFirestore } from "firebase/firestore";
+
+// Custom Input for Display Name
+const DisplayNameInput = ({ value, onChangeText }) => {
+  return (
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      placeholder="Enter your name"
+      placeholderTextColor="#cccccc"
+      style={{
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "white",
+        borderBottomWidth: 1,
+        borderBottomColor: "#FFFFFF",
+        paddingVertical: 4,
+      }}
+    />
+  );
+};
+
+// Custom Input for Photo URL
+const PhotoUrlInput = ({ value, onChangeText, onClear }) => {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        borderBottomWidth: 1,
+        borderBottomColor: "#FFFFFF",
+        paddingVertical: 4,
+      }}
+    >
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder="Enter photo URL"
+        placeholderTextColor="#cccccc"
+        style={{
+          fontSize: 14,
+          color: "white",
+          flex: 1, // Allow input to take remaining space
+        }}
+      />
+      {value !== "" && (
+        <TouchableOpacity onPress={onClear} style={{ marginLeft: 8 }}>
+          <Text style={{ color: "red", fontWeight: "bold", fontSize: 16 }}>
+            X
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
 
 const HomeScreen = () => {
   const { auth, user, logout } = useAuth();
   const insets = useSafeAreaInsets();
   const [teams, setTeams] = useState([]);
   const [account, setAccount] = useState(null);
-  const [firstName, setFirstName] = useState("");
+  // const [displayName, setDisplayName] = useState("");
 
-  useFocusEffect(
-    useCallback(() => {
-      refresh();
-    }, [auth])
-  );
+  const updateFirestoreUser = async (uid, data) => {
+    const firestore = getFirestore();
+    const userDocRef = doc(firestore, "users", uid);
+
+    try {
+      await setDoc(userDocRef, data, { merge: true });
+      console.log("Firestore user data successfully updated:", data);
+    } catch (error) {
+      console.error("Error updating Firestore user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+
+    const userDocRef = doc(firestore, "users", user.uid);
+
+    const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        console.log("Real-time user data:", userData);
+        setPhotoUrl(userData.photoURL || null);
+      } else {
+        console.log("User document does not exist.");
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup listener
+  }, [user]);
+
 
   async function refresh() {
     if (!auth) return;
-    setFirstName(await AsyncStorage.getItem("first_name"));
-    const account = await AsyncStorage.getItem("account");
-    console.log("account from HomeScreen: ", account);
-    setAccount(account);
 
-    const idToken =
-      auth && auth.currentUser ? await auth.currentUser.getIdToken(true) : null;
+    const currentUser = user;
+    if (!currentUser) return;
+
+    console.log("refreshing!");
+    const idToken = await currentUser.getIdToken(true);
     if (account && idToken) {
       defaults.get(
-        account == "admin" ? "fetchAllTeams" : account === "coach" ? "fetchCoachTeams" : "fetchPlayerTeams",
+        account == "admin"
+          ? "fetchAllTeams"
+          : account === "coach"
+            ? "fetchCoachTeams"
+            : "fetchPlayerTeams",
         null,
         null,
         (response) => {
@@ -61,8 +147,36 @@ const HomeScreen = () => {
     }
   }
 
+  const handleSetDisplayName = async (value) => {
+    if (user && auth) {
+      try {
+        await updateProfile(user, { displayName: value });
+        console.log("Firebase Auth displayName updated to:", value);
+
+        await updateFirestoreUser(user.uid, { displayName: value });
+        await AsyncStorage.setItem("displayName", value);
+      } catch (error) {
+        console.error("Error updating displayName:", error);
+      }
+    }
+  };
+
+  const handleSetPhotoUrl = async (value) => {
+    if (user && auth) {
+      try {
+        await updateProfile(user, { photoURL: value });
+        console.log("Firebase Auth photoURL updated to:", value);
+
+        await updateFirestoreUser(user.uid, { photoURL: value });
+        await AsyncStorage.setItem("photoURL", value);
+      } catch (error) {
+        console.error("Error updating photoURL:", error);
+      }
+    }
+  };
+
   async function logOut() {
-    await AsyncStorage.removeItem("auth_token");
+    await AsyncStorage.clear();
     await logout();
     router.replace("/login");
   }
@@ -115,6 +229,26 @@ const HomeScreen = () => {
     );
   }
 
+  async function handleClearPhotoUrl() {
+    const newData = {
+      photoURL: "",
+    };
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      updateProfile(currentUser, {
+        photoURL: "",
+      })
+        .then(() => {
+          console.log("Photo URL successfully cleared");
+        })
+        .catch((error) => {
+          // An error occurred
+          console.error(error);
+        });
+    }
+  }
+
   return (
     <GestureHandlerRootView>
       <View
@@ -127,10 +261,22 @@ const HomeScreen = () => {
           resizeMode="contain"
         />
         <View className="flex flex-row items-center mx-4 mb-4">
-          <Image source={images.dummy.ronaldo} className="h-[52] w-[52]" />
+          <Image
+            source={user?.photoURL ? { uri: user.photoURL } : admin}
+            className="h-[52] w-[52] rounded-full"
+          />
+
           <View className="mx-4 flex-1">
             <Text className="text-white">Hello,</Text>
-            <Text className="text-white font-bold text-xl">{firstName}</Text>
+            <DisplayNameInput
+              value={user?.displayName || ""}
+              onChangeText={handleSetDisplayName}
+            />
+            <PhotoUrlInput
+              value={user?.photoURL || ""}
+              onChangeText={handleSetPhotoUrl}
+              onClear={handleClearPhotoUrl}
+            />
           </View>
           <TouchableOpacity
             className="w-[42] h-[42] rounded-xl border-[1px] border-[#FFFFFF] flex items-center justify-center"

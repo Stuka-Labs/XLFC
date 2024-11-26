@@ -11,6 +11,9 @@
       "@/*": [
         "./*"
       ],
+      "@/app": [
+        "./app"
+      ],
       "@/components": [
         "./components"
       ],
@@ -24,9 +27,10 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "**/*.jsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules/"
   ]
 }
