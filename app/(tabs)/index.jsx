@@ -18,6 +18,7 @@ import defaults from "@/lib/defaults";
 import env from "@/env";
 import { updateProfile } from "firebase/auth";
 import admin from "@/assets/images/dummy/role_admin.png";
+import axios from "axios";
 
 // Custom Input for Display Name
 const DisplayNameInput = ({ value, onChangeText }) => {
@@ -80,45 +81,63 @@ const HomeScreen = () => {
   const [photoURL, setPhotoUrl] = useState(null);
   const [showPhotoInput, setShowPhotoInput] = useState(false); // New state
 
-  useEffect(() => {
-    if (!user) return;
-    setDisplayName(user.displayName);
-    setPhotoUrl(user.photoURL);
-  }, [user]);
+  async function addTeamRecord() {
+    const idToken = await auth.currentUser.getIdToken(true);
+    const teamData = {
+      uid: user.uid,
+      teamId: "xlfc",
+      name: "XL Reddings FC",
+      description: "XL Reddings Football Club",
+    };
+    console.log('teamData', teamData)
+    const baseUrl = env.API_DOMAIN_WITH_ENDPOINT("fetchAllPlayersOnTeam");
+    const url = `${baseUrl}addTeam`;
 
-  async function refresh() {
-    if (!auth) return;
+    // Use defaults.post
+    defaults.post(
+      "addTeam",
+      teamData,
+      null,
+      async (response) => {
+        console.log("Team added successfully via defaults:", response.data.uid);
+        setTeams((prevTeams) => [...prevTeams, response.data]);
+      },
+      async (error) => {
+        console.error("Error adding team via defaults:", error);
 
-    const currentUser = user;
-    if (!currentUser) return;
-
-    console.log("refreshing!");
-    const idToken = await currentUser.getIdToken(true);
-    if (account && idToken) {
-      defaults.get(
-        account == "admin"
-          ? "fetchAllTeams"
-          : account === "coach"
-            ? "fetchCoachTeams"
-            : "fetchPlayerTeams",
-        null,
-        null,
-        (response) => {
-          setTeams(response.data);
-          if (response.data.length == 0)
-            router.push({
-              pathname: "/success",
-              params: {
-                message:
-                  "Your Account has been created.\nPlease wait while admin approves",
-              },
-            });
-        },
-        null,
-        `${idToken}`
-      );
-    }
+        // Fallback to Axios
+        try {
+          const response = await axios.post(url, teamData, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+          });
+          console.log("Team added successfully via Axios:", response.data);
+          setTeams((prevTeams) => [...prevTeams, response.data]);
+        } catch (axiosError) {
+          console.error(
+            "Error adding team via Axios:",
+            axiosError.response?.data || axiosError.message
+          );
+        }
+      },
+      idToken,
+      url
+    );
   }
+
+  useEffect(() => {
+    async function init() {
+      if (!user) return;
+      setDisplayName(user.displayName);
+      setPhotoUrl(user.photoURL);
+      if (teams.length === 0) {
+        await addTeamRecord();
+      }
+    }
+    init();
+  }, [user]);
 
   async function logOut() {
     await AsyncStorage.clear();
@@ -217,6 +236,7 @@ const HomeScreen = () => {
       }
     }
   };
+
   return (
     <GestureHandlerRootView>
       <View
@@ -230,29 +250,27 @@ const HomeScreen = () => {
         />
         <View className="flex flex-row items-center mx-4 mb-4">
           {/* Profile Image */}
-          <TouchableOpacity
-            onPress={() => setShowPhotoInput(true)} // Show input on image click
-          >
+          <TouchableOpacity onPress={() => setShowPhotoInput(!showPhotoInput)}>
             <Image
               source={photoURL ? { uri: photoURL } : admin}
               className="h-[52] w-[52] rounded-full"
             />
           </TouchableOpacity>
           <View className="mx-4 flex-1">
-          <Text className="text-white">Hello,</Text>
-          <DisplayNameInput
-            value={displayName || ""}
-            onChangeText={(value) => setDisplayName(value)}
-          />
-          {/* Conditionally show the photo URL input */}
-          {showPhotoInput && (
-            <PhotoUrlInput
-              value={photoURL || ""}
-              onChangeText={handleSetPhotoUrl}
-              onClear={handleClearPhotoUrl}
+            <Text className="text-white">Hello,</Text>
+            <DisplayNameInput
+              value={displayName || ""}
+              onChangeText={(value) => setDisplayName(value)}
             />
-          )}
-        </View>
+            {/* Conditionally show the photo URL input */}
+            {showPhotoInput && (
+              <PhotoUrlInput
+                value={photoURL || ""}
+                onChangeText={handleSetPhotoUrl}
+                onClear={handleClearPhotoUrl}
+              />
+            )}
+          </View>
           <TouchableOpacity
             className="w-[42] h-[42] rounded-xl border-[1px] border-[#FFFFFF] flex items-center justify-center"
             onPress={logOut}
@@ -267,9 +285,9 @@ const HomeScreen = () => {
           <ScrollView className="px-4">
             <Text className="text-xl font-bold mt-6">Teams</Text>
 
-            {teams.map((team) => (
+            {teams.map((team, index) => (
               <TouchableOpacity
-                key={team.id}
+                key={team.teamId || `${team.name}-${index}`} // Fallback unique key
                 className="border-[1px] border-[#E4E4E4] mt-4 rounded-2xl p-4"
                 onPress={() => {
                   switch (account) {
@@ -277,7 +295,7 @@ const HomeScreen = () => {
                       router.push({
                         pathname: "/new-team",
                         params: {
-                          id: team.id,
+                          id: team.teamId, // Use teamId as a unique identifier
                           old_name: team.name,
                           old_description: team.description,
                         },
