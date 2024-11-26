@@ -152,7 +152,7 @@ const LoginScreen = () => {
             />
           }
         />
-        <PasswordInput value={password} />
+        <PasswordInput value={password} onChangeText={setPassword} />
         <View className="flex items-end">
           <Text
             className="underline text-gray-400 mx-4"
