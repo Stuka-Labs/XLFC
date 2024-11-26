@@ -18,8 +18,6 @@ import defaults from "@/lib/defaults";
 import env from "@/env";
 import { updateProfile } from "firebase/auth";
 import admin from "@/assets/images/dummy/role_admin.png";
-import { firestore } from "@/app/firebaseconfig";
-import { doc, onSnapshot, setDoc, getFirestore } from "firebase/firestore";
 
 // Custom Input for Display Name
 const DisplayNameInput = ({ value, onChangeText }) => {
@@ -80,38 +78,17 @@ const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const [teams, setTeams] = useState([]);
   const [account, setAccount] = useState(null);
-  // const [displayName, setDisplayName] = useState("");
+  const [displayName, setDisplayName] = useState(null);
+  const [photoURL, setPhotoUrl] = useState(null);
 
-  const updateFirestoreUser = async (uid, data) => {
-    const firestore = getFirestore();
-    const userDocRef = doc(firestore, "users", uid);
-
-    try {
-      await setDoc(userDocRef, data, { merge: true });
-      console.log("Firestore user data successfully updated:", data);
-    } catch (error) {
-      console.error("Error updating Firestore user data:", error);
-    }
-  };
 
   useEffect(() => {
     if (!user) return;
-
-    const userDocRef = doc(firestore, "users", user.uid);
-
-    const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        const userData = docSnapshot.data();
-        console.log("Real-time user data:", userData);
-        setPhotoUrl(userData.photoURL || null);
-      } else {
-        console.log("User document does not exist.");
-      }
-    });
-
-    return () => unsubscribe(); // Cleanup listener
+    const displayName = user.displayName;
+    const photoURL = user.photoURL;
+    setDisplayName(displayName);
+    setPhotoUrl(photoURL);
   }, [user]);
-
 
   async function refresh() {
     if (!auth) return;
@@ -153,7 +130,7 @@ const HomeScreen = () => {
         await updateProfile(user, { displayName: value });
         console.log("Firebase Auth displayName updated to:", value);
 
-        await updateFirestoreUser(user.uid, { displayName: value });
+        setDisplayName(value);
         await AsyncStorage.setItem("displayName", value);
       } catch (error) {
         console.error("Error updating displayName:", error);
@@ -167,7 +144,7 @@ const HomeScreen = () => {
         await updateProfile(user, { photoURL: value });
         console.log("Firebase Auth photoURL updated to:", value);
 
-        await updateFirestoreUser(user.uid, { photoURL: value });
+        setPhotoUrl(value);
         await AsyncStorage.setItem("photoURL", value);
       } catch (error) {
         console.error("Error updating photoURL:", error);
@@ -241,6 +218,7 @@ const HomeScreen = () => {
       })
         .then(() => {
           console.log("Photo URL successfully cleared");
+          setPhotoUrl(null);
         })
         .catch((error) => {
           // An error occurred
@@ -262,18 +240,18 @@ const HomeScreen = () => {
         />
         <View className="flex flex-row items-center mx-4 mb-4">
           <Image
-            source={user?.photoURL ? { uri: user.photoURL } : admin}
+            source={photoURL ? { uri: photoURL } : admin}
             className="h-[52] w-[52] rounded-full"
           />
 
           <View className="mx-4 flex-1">
             <Text className="text-white">Hello,</Text>
             <DisplayNameInput
-              value={user?.displayName || ""}
+              value={displayName || ""}
               onChangeText={handleSetDisplayName}
             />
             <PhotoUrlInput
-              value={user?.photoURL || ""}
+              value={photoURL || ""}
               onChangeText={handleSetPhotoUrl}
               onClear={handleClearPhotoUrl}
             />

@@ -91,33 +91,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(
       authInstance,
       async (user: User | null) => {
-        console.log("[authContext.tsx] auth state changed!", user);
-        setUser(user);
+
 
         if (user) {
-          const userDocRef = doc(firestore, "users", user.uid);
+          console.log("[authContext.tsx] auth state changed!", user);
+          setUser(user);
+          // const userDocRef = doc(firestore, "users", user.uid);
 
-          // Real-time listener for Firestore user document
-          const unsubscribeSnapshot = onSnapshot(userDocRef, async (doc) => {
-            if (doc.exists()) {
-              const userData = doc.data();
-              console.log("[authContext.tsx] Firestore user data:", userData);
+          // // Real-time listener for Firestore user document
+          // const unsubscribeSnapshot = onSnapshot(userDocRef, async (doc) => {
+          //   if (doc.exists()) {
+          //     const userData = doc.data();
+          //     console.log("[authContext.tsx] Firestore user data:", userData);
 
-              if (userData?.displayName) {
-                await AsyncStorage.setItem("displayName", userData.displayName);
-              }
+          //     if (userData?.displayName) {
+          //       await AsyncStorage.setItem("displayName", userData.displayName);
+          //     }
 
-              if (userData?.photoURL) {
-                await AsyncStorage.setItem("photoURL", userData.photoURL);
-              }
+          //     if (userData?.photoURL) {
+          //       await AsyncStorage.setItem("photoURL", userData.photoURL);
+          //     }
 
-              // Add any additional user data processing here
-            } else {
-              console.warn("User document does not exist in Firestore.");
-            }
-          });
+          //     // Add any additional user data processing here
+          //   } else {
+          //     console.warn("User document does not exist in Firestore.");
+          //   }
+          // });
 
-          return () => unsubscribeSnapshot();
+          // return () => unsubscribeSnapshot();
         }
 
         setLoading(false);
