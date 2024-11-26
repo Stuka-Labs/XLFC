@@ -43,4 +43,4 @@ jobs:
       - name: Run EAS Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform ios --non-interactive
+        run: eas build --platform ios --non-interactive --verbose
