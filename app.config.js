@@ -6,6 +6,7 @@ export default {
         slug: "XLFC",
         scheme: "xlfc",
         ios: {
+            "supportsTablet": true,
             googleServicesFile: "./assets/GoogleService-Info.plist",
             bundleIdentifier: "com.stuka.xlfc",
         },
