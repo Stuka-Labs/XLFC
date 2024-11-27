@@ -48,6 +48,7 @@ const RoleScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      if (!auth || !user) return;
       refresh();
     }, [auth, user])
   );

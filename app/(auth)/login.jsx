@@ -192,7 +192,7 @@ const LoginScreen = () => {
           inProgress={inProgress}
           onPress={handleLogin}
         />
-        <View className="flex flex-row items-center mx-auto space-x-4 mt-4">
+        {/* <View className="flex flex-row items-center mx-auto space-x-4 mt-4">
           <Image source={images.feedback.leftBar} className="w-[90] h-[1]" />
           <Text>Or continue with</Text>
           <Image source={images.feedback.rightBar} className="w-[90] h-[1]" />
@@ -208,7 +208,7 @@ const LoginScreen = () => {
           leftView={
             <Image source={images.socials.google} className="w-[28] h-[28]" />
           }
-        />
+        /> */}
         {!env.IS_PROD && (
           <View className="flex flex-row items-center justify-center mx-4 my-3">
             <Checkbox
