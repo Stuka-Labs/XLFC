@@ -43,12 +43,6 @@ const RegisterScreen = () => {
       console.log('[register.tsx] exiting handleRegister')
       return;
     }
-    await AsyncStorage.multiSet([
-      ["email", email],
-      ["surName", surName],
-      ["firstName", firstName],
-      ["phoneNumber", phoneNumber],
-    ]);
 
     if (env.IS_PROD && (!email || !password || password !== confirmPassword)) {
       defaults.simpleAlert(

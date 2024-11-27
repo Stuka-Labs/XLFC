@@ -27,7 +27,6 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-
 interface AuthContextInterface {
   user?: FirebaseAuthTypes.User | null;
   auth?: FirebaseAuthTypes.Auth | null;
@@ -68,7 +67,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [inProgress, setInProgress] = useState(false);
 
-
   useEffect(() => {
     const authInstance = getAuth();
     const firestore = getFirestore();
@@ -91,8 +89,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(
       authInstance,
       async (user: User | null) => {
-
-
         if (user) {
           console.log("[authContext.tsx] auth state changed!", user);
           setUser(user);
@@ -128,7 +124,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-
   const login = async (
     email: string | undefined,
     password: string | undefined,
@@ -158,6 +153,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const idToken = await currentUser.getIdToken(true);
 
       console.log("[authContext.tsx] User logged in successfully.");
+
+      const uid = await AsyncStorage.getItem("uid");
+      const firstName = await AsyncStorage.getItem("firstName");
+      const surName = await AsyncStorage.getItem("surName");
+      const phoneNumber = await AsyncStorage.getItem("phoneNumber");
+      const displayName = await AsyncStorage.getItem("displayName");
+      if (uid) {
+        await updateUser(
+          uid,
+          {
+            email: email,
+            firstName: firstName,
+            surName: surName,
+            phoneNumber: phoneNumber,
+            displayName: displayName,
+            emailVerified: true,
+          },
+          idToken
+        );
+      }
 
       // Redirect user based on account type
       await defaults.get(
@@ -207,16 +222,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const register = async (
-    email: string | undefined,
-    password: string | undefined,
-    firstName?: string | undefined,
-    surName?: string | undefined,
-    phoneNumber?: string | undefined,
+    email: string | null | undefined,
+    password: string | null | undefined,
+    firstName?: string | null,
+    surName?: string | null,
+    phoneNumber?: string | null,
     isAutoCreate: boolean = false
   ) => {
     try {
       setInProgress(true);
-
+      console.log("email", email);
+      console.log("password", password);
       email =
         (email && email.trim() !== "") || isAutoCreate ? email : env.TEST_EMAIL;
       password =
@@ -241,43 +257,69 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Update the user's profile in Firebase Auth
       await updateProfile(user, { displayName });
       const idToken = (await user.getIdToken(true)) || "";
-      const userObj = {
+
+      // Create user object for Firestore
+      const userDoc = {
+        uid: user.uid,
         email,
-        password,
-        confirmPassword: password,
         firstName,
         surName,
         phoneNumber,
         displayName,
-        token: idToken,
+        createdAt: new Date().toISOString(),
       };
 
-      console.log("Registering user in Firestore", userObj);
+      console.log("Registering user in Firestore", userDoc);
 
-      // // Store user information in Firestore or other backend
-      // await defaults.post(
-      //   "createUser",
-      //   userObj,
-      //   setInProgress,
-      //   (response) => {
-      //     console.log("User info:", response);
-      //     return Promise.resolve();
-      //   },
-      //   undefined,
-      //   "",
-      //   undefined
-      // );
-
-
+      // Save data to AsyncStorage
       await AsyncStorage.setItem("auth_token", idToken);
-      await AsyncStorage.setItem("displayName", displayName);
-
+      await AsyncStorage.multiSet([
+        ["email", email],
+        ["surName", userDoc.surName || ""],
+        ["firstName", userDoc.firstName  || ""],
+        ["phoneNumber", userDoc.phoneNumber  || ""],
+        ["displayName", userDoc.displayName],
+      ]);
       setUser(user);
     } catch (error) {
       console.error("Error registering: ", error);
       throw error;
     } finally {
       setInProgress(false);
+    }
+  };
+
+  const updateUser = async (
+    uid: string | null,
+    userData: {
+      email?: string | null;
+      firstName?: string | null;
+      surName?: string | null;
+      phoneNumber?: string | null;
+      displayName?: string | null;
+      emailVerified?: boolean;
+    },
+    token?: string
+  ) => {
+    try {
+      let url = `${env.API_DOMAIN_WITH_ENDPOINT(`/updateUser/${uid}`)}`;
+      // update url to replace the last "/" with ""
+      url = url.replace(/\/$/, "");
+      console.log("url from authContext to updateUser", url);
+      await defaults.putNew(
+        url, // Endpoint
+        userData, // Request body
+        null, // Optional progress callback
+        async (response) => {
+          console.log("User updated successfully:", response);
+        },
+        async (error) => {
+          console.error("Error updating user:", error);
+        },
+        token
+      );
+    } catch (err) {
+      console.error("Unexpected error:", err);
     }
   };
 

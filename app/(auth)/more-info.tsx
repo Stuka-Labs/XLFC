@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -9,6 +10,8 @@ import TopNavAction from "../../components/main/TopNavAction";
 import ButtonPrimary from "../../components/buttons/ButtonPrimary";
 import defaults from "@/lib/defaults";
 import env from "@/env";
+import axios from "axios";
+import FirebaseAuthTypes from "firebase/auth";
 
 const MoreInfoScreen = () => {
   const { auth, user, logout } = useAuth();
@@ -16,66 +19,50 @@ const MoreInfoScreen = () => {
   const [height, setHeight] = useState("");
   const [bmi, setBmi] = useState("");
 
-  const createTeam = async () => {
-    const idToken = await auth.currentUser?.getIdToken(true); // Get the ID token
-    const teamData = {
-      teamName: "XL Reddings FC", // Replace with your team name
-      coachUid: user?.uid, // Replace with the coach's UID if applicable
-      teamDescription: "A strong and dedicated football club",
-      teamLogo: null, // Provide logo details if needed
-    };
-
-    defaults.postNew(
-      "createTeam", // Endpoint name
-      teamData, // Request body
-      (inProgress) => console.log("Creating team in progress:", inProgress), // Optional progress indicator
-      (response) => console.log("Team created successfully:", response), // Success handler
-      (error) => console.error("Error creating team:", error), // Error handler
-      idToken // Authorization token
-    );
-  };
-
-  // Call createTeam inside useEffect or a button click handler
-  useEffect(() => {
-    createTeam();
-  }, []);
-
+  async function getToken(auth: FirebaseAuthTypes.Auth | null): Promise<string | undefined> {
+    const idToken =
+      !auth || !auth?.currentUser
+        ? undefined
+        : await auth.currentUser.getIdToken(true);
+    return idToken;
+  }
 
   async function addTeamRecord() {
-    const idToken = await auth.currentUser.getIdToken(true);
+    if (!auth || !auth.currentUser) {
+      console.error("Auth or currentUser is undefined.");
+      return;
+    }
+    const idToken = await getToken(auth);
+
     const teamData = {
-      uid: user.uid,
+      uid: user?.uid ?? "",
       teamId: "xlfc",
       name: "XL Reddings FC",
       description: "XL Reddings Football Club",
+      active: true,
     };
+
     console.log("teamData", teamData);
+
     const baseUrl = env.API_DOMAIN_WITH_ENDPOINT("fetchAllPlayersOnTeam");
     const url = `${baseUrl}addTeam`;
 
-    // Use defaults.post
-    defaults.post(
+    defaults.postNew(
       "addTeam",
       teamData,
-      null,
-      async (response) => {},
+      undefined,
+      async (response) => {
+        console.log("Team added successfully:", response);
+      },
       async (error) => {
         console.error("Error adding team via defaults:", error);
-
-        // Fallback to Axios
-        try {
-          const response = await axios.post(url, teamData, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${idToken}`,
-            },
-          });
-          console.log("Team added successfully via Axios:", response.data);
-        } catch (axiosError) {
+        if (axios.isAxiosError(error)) {
           console.error(
-            "Error adding team via Axios:",
-            axiosError.response?.data || axiosError.message
+            "Axios-specific error:",
+            error.response?.data || error.message
           );
+        } else {
+          console.error("Unexpected error:", error);
         }
       },
       idToken,
@@ -88,27 +75,27 @@ const MoreInfoScreen = () => {
   }, []);
 
   async function handleSaveData() {
+    if (!auth || !auth.currentUser) {
+      console.error("Auth or currentUser is undefined.");
+      return;
+    }
     const idToken = await auth.currentUser.getIdToken(true);
 
-    const baseUrl = env.API_DOMAIN_WITH_ENDPOINT("createInitialPlayerData");
-    const url = baseUrl;
-
-    // Construct the data to be sent in the request body
     const data = {
       teamId: "xlfc",
       token: idToken,
-      uid: user.uid,
+      uid: user?.uid ?? "",
       startWeight: weight,
       height: height,
       startBmi: bmi,
     };
 
     console.log("data", data);
-    // Use defaults.post
-    defaults.post(
+
+    defaults.postNew(
       "createInitialPlayerData",
       data,
-      null,
+      undefined,
       async (response) => {
         console.log("Initial player data saved successfully:", response);
         router.replace("/");
@@ -116,23 +103,30 @@ const MoreInfoScreen = () => {
       async (error) => {
         console.error("Error saving initial player data:", error);
       },
-      idToken,
-      url
+      idToken
     );
   }
 
   return (
     <GestureHandlerRootView>
-      <SafeAreaView className="bg-white h-full">
+      <SafeAreaView style={{ backgroundColor: "white", height: "100%" }}>
         <TopNavAction title="Create Account" />
         <ScrollView>
-          <Text className="text-xl font-semibold mx-4 mb-4">More Info</Text>
+          <Text style={{ fontSize: 20, fontWeight: "bold", margin: 16 }}>
+            More Info
+          </Text>
           <DefaultInput
             label="Start Weight"
             style="mx-4 my-3"
             placeholder="Kgs"
             text={weight}
             setText={setWeight}
+            keyboardType="numeric"
+            autoCapitalize="none"
+            maxLength={10}
+            secureTextEntry={undefined}
+            rightView={undefined}
+            onClick={undefined}
           />
           <DefaultInput
             label="Height"
@@ -140,6 +134,12 @@ const MoreInfoScreen = () => {
             placeholder="cm"
             text={height}
             setText={setHeight}
+            keyboardType="numeric"
+            autoCapitalize="none"
+            maxLength={10}
+            secureTextEntry={undefined}
+            rightView={undefined}
+            onClick={undefined}
           />
           <DefaultInput
             label="BMI"
@@ -147,12 +147,23 @@ const MoreInfoScreen = () => {
             placeholder="27 Minimum"
             text={bmi}
             setText={setBmi}
+            keyboardType="numeric"
+            autoCapitalize="none"
+            maxLength={10}
+            secureTextEntry={undefined}
+            rightView={undefined}
+            onClick={undefined}
           />
         </ScrollView>
         <ButtonPrimary
           text="Continue"
           containerProps="mx-4 my-4"
           onPress={handleSaveData}
+          icon={null}
+          inProgress={false}
+          progressOver={undefined}
+          leftView={undefined}
+          rightView={undefined}
         />
       </SafeAreaView>
     </GestureHandlerRootView>

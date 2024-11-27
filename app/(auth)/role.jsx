@@ -81,6 +81,7 @@ const RoleScreen = () => {
       return;
     }
 
+    console.log("account.endpoint from role.jsx", account.endpoint);
     defaults.post(
       account.endpoint, // Endpoint
       {}, // Params

@@ -8,6 +8,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import mime from 'mime'
 // import auth from "@react-native-firebase/auth";
 import env from "@/env";
+import FirebaseAuthTypes, {
+  getAuth,
+} from "firebase/auth";
+
 
 const post = async (
   endpoint: string,
@@ -235,11 +239,60 @@ const simpleAlert = (
   Alert.alert(title, message, options, { cancelable: true });
 };
 
+async function putNew(
+  endpoint: string,
+  body: Record<string, any>,
+  progressCallback: ((inProgress: boolean) => void) | null,
+  onSuccess: (response: any) => Promise<void>,
+  onError: (error: any) => Promise<void>,
+  token?: string,
+) {
+  try {
+
+    progressCallback?.(true);
+    console.log('endpoint', endpoint);
+    console.log(JSON.stringify(body));
+    const response = await fetch(endpoint, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    console.log("Raw response:", response);
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null); // Handle non-JSON error responses
+      throw new Error(error?.message || "An error occurred");
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      data = null; // Fallback for responses with no body or non-JSON body
+    }
+
+    console.log("Parsed response data:", data);
+    await onSuccess(data);
+  } catch (error) {
+    console.error("Error in putNew:", JSON.stringify(error));
+    await onError(error);
+  } finally {
+    progressCallback?.(false);
+  }
+}
+
+
+
 export default {
   post: post,
   get: get,
   getNew: getNew,
   postNew: postNew,
+  putNew: putNew,
   copy: (i: any) => JSON.parse(JSON.stringify(i)),
   call: (number: any) => Linking.openURL(`tel:+${number}`),
   simpleAlert: simpleAlert,
