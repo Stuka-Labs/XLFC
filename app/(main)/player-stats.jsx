@@ -27,48 +27,48 @@ const PlayerStatsScreen = () => {
     { startAngle: 65, endAngle: 85, color: 'green' },
   ];
 
-  const weeks = [
-    {
-      week: 1,
-      points: 42.75
-    },
-    {
-      week: 2,
-      points: -10.25
-    },
-    {
-      week: 3,
-      points: 0
-    },
-    {
-      week: 4,
-      points: 91.5
-    },
-    {
-      week: 5,
-      points: -12.75
-    },
-    {
-      week: 6,
-      points: 15.25
-    },
-    {
-      week: 7,
-      points: 27.75
-    },
-    {
-      week: 8,
-      points: 30.5
-    },
-    {
-      week: 9,
-      points: -19.25
-    },
-    {
-      week: 10,
-      points: 45.75
-    }
-  ]
+  // const weeks = [
+  //   {
+  //     week: 1,
+  //     points: 42.75
+  //   },
+  //   {
+  //     week: 2,
+  //     points: -10.25
+  //   },
+  //   {
+  //     week: 3,
+  //     points: 0
+  //   },
+  //   {
+  //     week: 4,
+  //     points: 91.5
+  //   },
+  //   {
+  //     week: 5,
+  //     points: -12.75
+  //   },
+  //   {
+  //     week: 6,
+  //     points: 15.25
+  //   },
+  //   {
+  //     week: 7,
+  //     points: 27.75
+  //   },
+  //   {
+  //     week: 8,
+  //     points: 30.5
+  //   },
+  //   {
+  //     week: 9,
+  //     points: -19.25
+  //   },
+  //   {
+  //     week: 10,
+  //     points: 45.75
+  //   }
+  // ]
 
   return (
     <GestureHandlerRootView>
@@ -87,7 +87,7 @@ const PlayerStatsScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          
+
           <View className="flex flex-row mx-4 my-4">
             <View className="flex-1">
               <Text className="text-xs">Current Points</Text>
@@ -102,7 +102,7 @@ const PlayerStatsScreen = () => {
               <Text className="text-lg text-green-400 font-semibold">-6 KG</Text>
             </View>
           </View>
-          
+
           <View className="flex flex-row mx-4 my-2.5">
             <Text className="flex-1 font-bold text-xl">Points Breakdown</Text>
             <Entypo name="dots-two-vertical" size={24} color="black" />
@@ -141,12 +141,12 @@ const PlayerStatsScreen = () => {
             percent={0.37}
             arcPadding={0.02}
           /> */}
-          
+
           <View className="flex flex-row mx-4 my-6">
             <Text className="flex-1 font-bold text-xl">Current Weight</Text>
             <Entypo name="dots-two-vertical" size={24} color="black" />
           </View>
-          
+
           <View className="mx-auto my-2">
             {/* <GaugeWithBlob width={200} height={200} strokeWidth={10} color="blue" /> */}
             <GaugeWithBlob width={275} height={275} strokeWidth={17.5} sections={sections} />

@@ -283,7 +283,7 @@ const HomeScreen = () => {
             {teams.map((team, index) => (
               <TouchableOpacity
                 key={team.teamId || `${team.name}-${index}`}
-                className="border-[1px] border-[#E4E4E4] mt-4 rounded-2xl p-4"
+                className="border-[1px] border-[#E4E4E4] !border-red-500 mt-4 rounded-2xl p-4"
                 onPress={() => {
                   switch (account) {
                     case "admin":
@@ -293,6 +293,15 @@ const HomeScreen = () => {
                           id: team.teamId, // Use teamId as a unique identifier
                           old_name: team.name,
                           old_description: team.description,
+                        },
+                      });
+                      default:
+                      router.push({
+                        pathname: "/player-stats",
+                        params: {
+                          id: team.teamId, // Use teamId as a unique identifier
+                          name: team.name,
+                          description: team.description,
                         },
                       });
                       break;

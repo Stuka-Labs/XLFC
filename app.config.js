@@ -5,6 +5,7 @@ export default {
     name: "XLFC",
     slug: "XLFC",
     scheme: "xlfc",
+    "version": "1.0.1",
     ios: {
       useFrameworks: "static", // Required for Firebase integration
       supportsTablet: true,
