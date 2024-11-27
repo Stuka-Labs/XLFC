@@ -106,11 +106,11 @@ const HomeScreen = () => {
           );
           if (Array.isArray(response.data)) {
             setMembers(response.data.length);
-            console.log(response.data[0].height);
+
             // console.log('parseInt(response.data[0].height) + parseInt(response.data[0].weight)', parseInt((response.data[0].height)) + parseInt((response.data[0].weight)));
             setTotalPoints(
-              parseInt(response.data[0].height) +
-                parseInt(response.data[0].bonusPoints)
+              parseInt(response.data[0]?.height || 0) +
+                parseInt(response.data[0]?.bonusPoints || 0)
             );
           }
         },
@@ -286,10 +286,11 @@ const HomeScreen = () => {
 
             {teams.map((team, index) => (
               <TouchableOpacity
-                key={team.teamId || `${team.name}-${index}`} // Fallback unique key
+                key={team.teamId || `${team.name}-${index}`}
                 className="border-[1px] border-[#E4E4E4] mt-4 rounded-2xl p-4"
                 onPress={() => {
                   switch (account) {
+
                     case "admin":
                       router.push({
                         pathname: "/new-team",
@@ -309,7 +310,7 @@ const HomeScreen = () => {
                     className="h-[57] w-[57]"
                     resizeMode="contain"
                   />
-                  <View className="mx-2.5 flex-1">
+                  <View classaName="mx-2.5 flex-1">
                     <Text className="font-bold text-lg">{team.name}</Text>
                     {team.description && (
                       <Text className="text-gray-500 text-xs">
