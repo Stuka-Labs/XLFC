@@ -110,6 +110,109 @@ const get = async (
   }
 };
 
+const getNew = async (
+  endpoint: string,
+  params: Record<string, string | number> = {},
+  setInProgress?: (inProgress: boolean) => void,
+  onSuccess?: (response: any) => void,
+  onError?: (error: any) => void,
+  token?: string,
+  fullUrl?: string
+) => {
+  try {
+    // Construct the base URL
+    const baseUrl = fullUrl ?? env.API_DOMAIN_WITH_ENDPOINT(endpoint);
+
+    // Add query parameters to the URL
+    const queryString = new URLSearchParams(
+      Object.entries(params).map(([key, value]) => [key, String(value)])
+    ).toString();
+
+    const url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+
+    // Get the authentication token
+    const authToken = token ?? (await AsyncStorage.getItem("auth_token"));
+
+    // Set the progress indicator to true
+    setInProgress && setInProgress(true);
+
+    // Perform the GET request
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(authToken && { Authorization: `Bearer ${authToken}` }), // Add Authorization header if the token exists
+      },
+    });
+
+    const data = await response.json();
+
+    // Handle success and failure
+    if (response.ok) {
+      console.info("GET Request Success:", { endpoint, params, data });
+      onSuccess && onSuccess(data);
+    } else {
+      console.error("GET Request Failed:", { endpoint, params, data });
+      onError && onError(data);
+    }
+  } catch (error) {
+    console.error("GET Request Error:", { endpoint, params, error });
+    onError && onError(error);
+  } finally {
+    // Set the progress indicator to false
+    setInProgress && setInProgress(false);
+  }
+};
+const postNew = async (
+  endpoint: string,
+  body: Record<string, any> = {},
+  setInProgress?: (inProgress: boolean) => void,
+  onSuccess?: (response: any) => void,
+  onError?: (error: any) => void,
+  token?: string,
+  fullUrl?: string
+) => {
+  try {
+    // Construct the base URL
+    const baseUrl = fullUrl ?? env.API_DOMAIN_WITH_ENDPOINT(endpoint);
+    const url = baseUrl;
+
+    // Get the authentication token
+    const authToken = token ?? (await AsyncStorage.getItem("auth_token"));
+
+    // Set the progress indicator to true
+    setInProgress && setInProgress(true);
+
+    // Perform the POST request
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(authToken && { Authorization: `Bearer ${authToken}` }), // Add Authorization header if the token exists
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    // Handle success and failure
+    if (response.ok) {
+      console.info("POST Request Success:", { endpoint, body, data });
+      onSuccess && onSuccess(data);
+    } else {
+      console.error("POST Request Failed:", { endpoint, body, data });
+      onError && onError(data);
+    }
+  } catch (error) {
+    console.error("POST Request Error:", { endpoint, body, error });
+    onError && onError(error);
+  } finally {
+    // Set the progress indicator to false
+    setInProgress && setInProgress(false);
+  }
+};
+
+
 const simpleAlert = (
   title: string,
   message: string | undefined,
@@ -135,6 +238,8 @@ const simpleAlert = (
 export default {
   post: post,
   get: get,
+  getNew: getNew,
+  postNew: postNew,
   copy: (i: any) => JSON.parse(JSON.stringify(i)),
   call: (number: any) => Linking.openURL(`tel:+${number}`),
   simpleAlert: simpleAlert,

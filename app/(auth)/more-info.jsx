@@ -16,6 +16,31 @@ const MoreInfoScreen = () => {
   const [height, setHeight] = useState("");
   const [bmi, setBmi] = useState("");
 
+  const createTeam = async () => {
+    const idToken = await auth.currentUser?.getIdToken(true); // Get the ID token
+    const teamData = {
+      teamName: "XL Reddings FC", // Replace with your team name
+      coachUid: user?.uid, // Replace with the coach's UID if applicable
+      teamDescription: "A strong and dedicated football club",
+      teamLogo: null, // Provide logo details if needed
+    };
+
+    defaults.postNew(
+      "createTeam", // Endpoint name
+      teamData, // Request body
+      (inProgress) => console.log("Creating team in progress:", inProgress), // Optional progress indicator
+      (response) => console.log("Team created successfully:", response), // Success handler
+      (error) => console.error("Error creating team:", error), // Error handler
+      idToken // Authorization token
+    );
+  };
+
+  // Call createTeam inside useEffect or a button click handler
+  useEffect(() => {
+    createTeam();
+  }, []);
+
+
   async function addTeamRecord() {
     const idToken = await auth.currentUser.getIdToken(true);
     const teamData = {

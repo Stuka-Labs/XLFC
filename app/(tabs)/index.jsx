@@ -20,6 +20,8 @@ import { updateProfile } from "firebase/auth";
 import admin from "@/assets/images/dummy/role_admin.png";
 import axios from "axios";
 
+// https://avatars.githubusercontent.com/u/28612032?v=4
+
 // Custom Input for Display Name
 const DisplayNameInput = ({ value, onChangeText }) => {
   return (
@@ -79,64 +81,62 @@ const HomeScreen = () => {
   const [account, setAccount] = useState(null);
   const [displayName, setDisplayName] = useState(null);
   const [photoURL, setPhotoUrl] = useState(null);
-  const [showPhotoInput, setShowPhotoInput] = useState(false); // New state
-
-  async function addTeamRecord() {
-    const idToken = await auth.currentUser.getIdToken(true);
-    const teamData = {
-      uid: user.uid,
-      teamId: "xlfc",
-      name: "XL Reddings FC",
-      description: "XL Reddings Football Club",
-    };
-    console.log('teamData', teamData)
-    const baseUrl = env.API_DOMAIN_WITH_ENDPOINT("fetchAllPlayersOnTeam");
-    const url = `${baseUrl}addTeam`;
-
-    // Use defaults.post
-    defaults.post(
-      "addTeam",
-      teamData,
-      null,
-      async (response) => {
-        setTeams((prevTeams) => [...prevTeams, response.data]);
-      },
-      async (error) => {
-        console.error("Error adding team via defaults:", error);
-
-        // Fallback to Axios
-        try {
-          const response = await axios.post(url, teamData, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${idToken}`,
-            },
-          });
-          console.log("Team added successfully via Axios:", response.data);
-          setTeams((prevTeams) => [...prevTeams, response.data]);
-        } catch (axiosError) {
-          console.error(
-            "Error adding team via Axios:",
-            axiosError.response?.data || axiosError.message
-          );
-        }
-      },
-      idToken,
-      url
-    );
-  }
+  const [showPhotoInput, setShowPhotoInput] = useState(false);
+  const [members, setMembers] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     async function init() {
-      if (!user) return;
+      if (!user || !auth?.currentUser) return;
+
       setDisplayName(user.displayName);
       setPhotoUrl(user.photoURL);
-      // if (teams.length === 0) {
-      //   await addTeamRecord();
-      // }
+
+      const idToken = await auth.currentUser.getIdToken(true);
+
+      // Fetch players on team
+      defaults.getNew(
+        "fetchAllPlayersOnTeam",
+        { teamId: "xlfc", searchQuery: "xlfc" }, // Add your query parameters here
+        (inProgress) => console.log("Fetching in progress:", inProgress),
+        (response) => {
+          console.log(
+            "Response from fetchAllPlayersOnTeam !!!!!!!!!!!!!!!!!!!!!!!!!!!!:",
+            response.data
+          );
+          if (Array.isArray(response.data)) {
+            setMembers(response.data.length);
+            console.log(response.data[0].height);
+            // console.log('parseInt(response.data[0].height) + parseInt(response.data[0].weight)', parseInt((response.data[0].height)) + parseInt((response.data[0].weight)));
+            setTotalPoints(
+              parseInt(response.data[0].height) +
+                parseInt(response.data[0].bonusPoints)
+            );
+          }
+        },
+        (error) => console.error("Error fetching players:", error),
+        idToken // Optional token
+      );
+
+      // Fetch all teams
+      defaults.getNew(
+        "fetchAllTeams",
+        {}, // No additional query parameters
+        (inProgress) =>
+          console.log("Fetching all teams in progress:", inProgress),
+        (response) => {
+          console.log("Response from fetchAllTeams:", response.data);
+          if (Array.isArray(response.data)) {
+            setTeams(response.data);
+          }
+        },
+        (error) => console.error("Error fetching teams:", error),
+        idToken // Optional token
+      );
     }
+
     init();
-  }, [user]);
+  }, [user, members, auth]);
 
   async function logOut() {
     await AsyncStorage.clear();
@@ -315,6 +315,26 @@ const HomeScreen = () => {
                       <Text className="text-gray-500 text-xs">
                         {team.description}
                       </Text>
+                    )}
+                    {(members > 0 || totalPoints > 0) && (
+                      <View className="flex-row items-center space-x-2">
+                        {members > 0 && (
+                          <Text className="text-gray-500 text-xs font-bold">
+                            {members}
+                            <Text className="text-gray-500 text-xs text-green-500 font-bold">
+                              &nbsp;Members
+                            </Text>
+                          </Text>
+                        )}
+                        {totalPoints > 0 && (
+                          <Text className="text-gray-500 text-xs font-bold">
+                            {totalPoints}
+                            <Text className="text-gray-500 text-xs text-green-500 font-bold">
+                              &nbsp;Total Points
+                            </Text>
+                          </Text>
+                        )}
+                      </View>
                     )}
                   </View>
                 </View>
