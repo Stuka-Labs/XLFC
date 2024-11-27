@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   View,
@@ -18,7 +18,6 @@ import defaults from "@/lib/defaults";
 import env from "@/env";
 import { updateProfile } from "firebase/auth";
 import admin from "@/assets/images/dummy/role_admin.png";
-import axios from "axios";
 
 // https://avatars.githubusercontent.com/u/28612032?v=4
 
@@ -100,10 +99,7 @@ const HomeScreen = () => {
         { teamId: "xlfc", searchQuery: "xlfc" }, // Add your query parameters here
         (inProgress) => console.log("Fetching in progress:", inProgress),
         (response) => {
-          console.log(
-            "Response from fetchAllPlayersOnTeam !!!!!!!!!!!!!!!!!!!!!!!!!!!!:",
-            response.data
-          );
+          console.log("Response from fetchAllPlayersOnTeam", response.data);
           if (Array.isArray(response.data)) {
             setMembers(response.data.length);
 
@@ -290,7 +286,6 @@ const HomeScreen = () => {
                 className="border-[1px] border-[#E4E4E4] mt-4 rounded-2xl p-4"
                 onPress={() => {
                   switch (account) {
-
                     case "admin":
                       router.push({
                         pathname: "/new-team",
