@@ -254,19 +254,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       console.log("Registering user in Firestore", userObj);
 
-      // Store user information in Firestore or other backend
-      await defaults.post(
-        "createUser",
-        userObj,
-        setInProgress,
-        (response) => {
-          console.log("User info:", response);
-          return Promise.resolve();
-        },
-        undefined,
-        "",
-        undefined
-      );
+      // // Store user information in Firestore or other backend
+      // await defaults.post(
+      //   "createUser",
+      //   userObj,
+      //   setInProgress,
+      //   (response) => {
+      //     console.log("User info:", response);
+      //     return Promise.resolve();
+      //   },
+      //   undefined,
+      //   "",
+      //   undefined
+      // );
 
 
       await AsyncStorage.setItem("auth_token", idToken);
