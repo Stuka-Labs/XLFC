@@ -1,9 +1,9 @@
-import React from "react";
+import * as React from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../context/authContext";
 import DefaultInput from "../../components/inputs/DefaultInput";
 import TopNavAction from "../../components/main/TopNavAction";

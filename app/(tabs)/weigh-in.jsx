@@ -3,7 +3,7 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { useLocalSearchParams, useFocusEffect, router } from 'expo-router'
+import { useNavigation } from "@react-navigation/native";
 
 import TopNavAction from '../../components/main/TopNavAction'
 import SearchBar from '../../components/inputs/SearchBar'
@@ -11,6 +11,8 @@ import SearchBar from '../../components/inputs/SearchBar'
 import images from '../../assets/images'
 
 const WeighInScreen = () => {
+
+  const navigation = useNavigation()
 
   const insets = useSafeAreaInsets()
 
@@ -40,7 +42,7 @@ const WeighInScreen = () => {
       name: 'Neuer'
     }
   ]
-  
+
   return (
     <GestureHandlerRootView>
       <View className="bg-white h-full" style={{ paddingTop: Platform.OS == 'android' ? StatusBar.currentHeight : insets.top }}>
@@ -49,7 +51,7 @@ const WeighInScreen = () => {
         <ScrollView className="mt-2">
           <Text className="mx-4 my-2 text-gray-600">Players</Text>
           {players.map(p => (
-            <TouchableOpacity key={p.image} className="bg-[#F0F0F1] mx-4 my-1 rounded-2xl px-4 py-2.5 flex flex-row space-x-2.5 items-center" onPress={() => router.push({
+            <TouchableOpacity key={p.image} className="bg-[#F0F0F1] mx-4 my-1 rounded-2xl px-4 py-2.5 flex flex-row space-x-2.5 items-center" onPress={() => navigation.push({
               pathname: '/weigh-in-editor',
               params: {
                 player_image: p.image,

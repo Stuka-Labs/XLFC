@@ -1,23 +1,39 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import { useFonts } from 'expo-font'
-import { Stack } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
-import React, { useEffect } from 'react'
-import 'react-native-reanimated'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { AuthProvider } from '@/context/authContext'
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as React from "react";
+import "react-native-reanimated";
+import { AuthProvider } from "@/context/authContext";
+import AuthLayout from "./(auth)/_layout";
+import NotFoundScreen from "./+not-found";
+import MainLayout from "./(main)/_layout";
+import TabLayout from "./(tabs)/_layout";
 
 export default function RootLayout() {
+  const Stack = createNativeStackNavigator();
 
   return (
     <AuthProvider>
-    <Stack>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(main)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      {/* <Stack.Screen name="(account)" options={{ headerShown: false }} /> */}
-      <Stack.Screen name="+not-found" />
-    </Stack>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="(auth)"
+            options={{ headerShown: false }}
+            component={AuthLayout}
+          />
+          <Stack.Screen
+            name="(main)"
+            options={{ headerShown: false }}
+            component={MainLayout}
+          />
+          <Stack.Screen
+            name="(tabs)"
+            options={{ headerShown: false }}
+            component={TabLayout}
+          />
+          {/* <Stack.Screen name="(account)" options={{ headerShown: false }} /> */}
+          <Stack.Screen name="+not-found" component={NotFoundScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </AuthProvider>
-  )
+  );
 }

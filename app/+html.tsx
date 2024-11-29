@@ -1,5 +1,15 @@
-import { ScrollViewStyleReset } from 'expo-router/html';
-import { type PropsWithChildren } from 'react';
+import React, { type PropsWithChildren } from 'react';
+
+// Define ScrollViewStyleReset as a placeholder
+const ScrollViewStyleReset = () => (
+  <style>
+    {`
+      body {
+        overflow: hidden;
+      }
+    `}
+  </style>
+);
 
 /**
  * This file is web-only and used to configure the root HTML for every web page during static rendering.

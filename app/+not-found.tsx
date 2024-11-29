@@ -1,32 +1,49 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import * as React from "react";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// Define your navigation stack type
+type RootStackParamList = {
+  Home: undefined; // Add other routes as needed
+};
 
 export default function NotFoundScreen() {
+  // Ensure TypeScript knows about your navigation stack
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
+    <View style={styles.container}>
+      <Text style={styles.title}>This screen doesn't exist.</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("Home")} style={styles.link}>
+        <Text style={styles.linkText}>Go to home screen!</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   link: {
     marginTop: 15,
     paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: "#007BFF",
+    borderRadius: 8,
+  },
+  linkText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

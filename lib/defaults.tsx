@@ -1,7 +1,4 @@
-/* eslint-disable no-undef */
 import { Alert, Linking } from "react-native";
-import { Tabs, Redirect, router, useFocusEffect } from "expo-router";
-
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { fileTypeFromFile } from 'file-type'
@@ -116,7 +113,7 @@ const get = async (
 
 const getNew = async (
   endpoint: string,
-  params: Record<string, string | number> = {},
+  params: Record<string, any> = {},
   setInProgress?: (inProgress: boolean) => void,
   onSuccess?: (response: any) => void,
   onError?: (error: any) => void,
@@ -220,8 +217,8 @@ const postNew = async (
 const simpleAlert = (
   title: string,
   message: string | undefined,
-  positive: any,
-  onPress: any,
+  positive: any | undefined,
+  onPress: any | undefined,
   negative = "Cancel"
 ) => {
   const options = [

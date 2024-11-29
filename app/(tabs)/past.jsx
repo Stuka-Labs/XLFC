@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Table, TableWrapper, Row, Rows, Col } from 'react-native-reanimated-table'
 
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from 'react-native-vector-icons/AntDesign';;
 
 import images from '../../assets/images'
 
@@ -60,17 +60,17 @@ const PastSeasonsScreen = () => {
         </View>
         <View className="bg-white flex-1 rounded-t-[33.3px] overflow-hidden">
           <Text className="text-xl font-bold px-4 py-6">League Table</Text>
-          
+
           {/* TABLE */}
 
           <View className="">
             <ScrollView horizontal={true}>
               <View>
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                  <Row 
-                    data={tableHead} 
-                    widthArr={widthArr} 
-                    style={{ height: 50 }} 
+                  <Row
+                    data={tableHead}
+                    widthArr={widthArr}
+                    style={{ height: 50 }}
                     textStyle={{ paddingHorizontal: 16 }}
                   />
                 </Table>

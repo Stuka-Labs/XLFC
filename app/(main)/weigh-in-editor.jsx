@@ -6,7 +6,7 @@ import { useLocalSearchParams, useFocusEffect, router } from 'expo-router'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import AntDesign from '@expo/vector-icons/AntDesign'
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import DefaultInput from '../../components/inputs/DefaultInput'
 import TopNavAction from '../../components/main/TopNavAction'
@@ -45,7 +45,7 @@ const WeighInEditorScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <DefaultInput 
+          <DefaultInput
             label="Date of Weigh-in"
             style="mx-4 my-3"
             placeholder="Enter Date"
@@ -58,42 +58,42 @@ const WeighInEditorScreen = () => {
               />
             }
           />
-          <DefaultInput 
+          <DefaultInput
             label="Weight"
             style="mx-4 my-3"
             placeholder="Enter Weight"
             text={weight}
             setText={setWeight}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Food Diary"
             style="mx-4 my-3"
             placeholder="1 or 0"
             text={foodDiary}
             setText={setFoodDiary}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Step Counter"
             style="mx-4 my-3"
             placeholder="1 or 0"
             text={stepCounter}
             setText={setStepCounter}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Weight Loss Milestone"
             style="mx-4 my-3"
             placeholder="1 or 0"
             text={weightLossMilestone}
             setText={setWeightLossMilestone}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Park Run"
             style="mx-4 my-3"
             placeholder="1 or 0"
             text={parkRun}
             setText={setParkRun}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Coaches Bonus"
             style="mx-4 my-3"
             placeholder="1 or 0"
@@ -101,7 +101,7 @@ const WeighInEditorScreen = () => {
             setText={setCoachesBonus}
           />
         </ScrollView>
-        <ButtonPrimary 
+        <ButtonPrimary
           text="Submit"
           containerProps="mx-4 my-4"
           // onPress={() => router.push({
