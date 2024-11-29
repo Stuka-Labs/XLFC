@@ -16,7 +16,7 @@ install! 'cocoapods', :deterministic_uuids => false
 
 target 'XLFC' do
   use_frameworks!
-  use_expo_modules!
+  # use_expo_modules!
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
@@ -27,10 +27,10 @@ target 'XLFC' do
   #   :app_path => "#{Pod::Config.instance.installation_root}/..",
   #   :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   # )
-  # use_react_native!(
-  #   :path => '../node_modules/react-native',
-  #   :hermes_enabled => false, # or false if not using Hermes
-  # )
+  use_react_native!(
+    :path => '../node_modules/react-native',
+    :hermes_enabled => false, # or false if not using Hermes
+  )
 
   # Firebase and other dependencies
   pod 'GoogleUtilities', :modular_headers => true
@@ -40,10 +40,14 @@ target 'XLFC' do
   pod 'Firebase/Storage', :modular_headers => true
 
   # Remove extra React references:
-  pod 'React', :path => '../node_modules/react-native'
-  pod 'React-RCTActionSheet', :path => '../node_modules/react-native/React-RCTActionSheet'
-  # pod 'React-Core', :path => '../node_modules/react-native/React'
-  # pod 'React-RCTAppDelegate', :path => '../node_modules/react-native/React'
+  # pod 'React', :path => '../node_modules/react-native'
+  # pod 'React-Core', :path => '../node_modules/react-native'
+  # pod 'RCT-Folly', :path => '../node_modules/react-native'
+  # pod 'React-RCTActionSheet', :path => '../node_modules/react-native'
+
+  # pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
+
+  # pod 'React-RCTAppDelegate', :path => '../node_modules/react-native'
   # pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
   # pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
 
