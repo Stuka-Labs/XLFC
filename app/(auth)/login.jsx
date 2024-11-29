@@ -1,5 +1,5 @@
 // app/(auth)/login.jsx
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -27,6 +27,22 @@ const LoginScreen = () => {
   const [inProgress, setInProgress] = useState(false);
   const [autoCreate, setAutoCreate] = useState(false);
 
+  async function handleSetPing() {
+    const idToken = await auth.currentUser.getIdToken(true);
+    // ping https://ping-hhjsyj7q4q-uc.a.run.app
+    defaults.getNew(
+      "ping",
+      user,
+      setInProgress,
+      async (response) => {
+        console.log("Ping response:", response);
+        Alert.alert("Ping", "Ping successful");
+      },
+      undefined,
+      `${idToken}`,
+      "https://ping-hhjsyj7q4q-uc.a.run.app"
+    );
+  }
 
   useEffect(() => {
     async function getEmailAndPassword() {
@@ -61,7 +77,7 @@ const LoginScreen = () => {
       // await AsyncStorage.setItem("email", email);
 
       if (maybeUser) {
-        defaults.get(
+        defaults.getNew(
           "userInfo",
           currentUser,
           setInProgress,
@@ -121,7 +137,7 @@ const LoginScreen = () => {
         await AsyncStorage.setItem("email", userInfo.email);
 
         // Redirect the user based on account status
-        defaults.get(
+        defaults.getNew(
           "userInfo",
           {},
           setInProgress,
@@ -150,8 +166,8 @@ const LoginScreen = () => {
   }
 
   function handleUseTestUser() {
-    setEmail("bobloblaw@gmail.com")
-    setPassword("G9&kL!zX2@Yt~")
+    setEmail("bobloblaw@gmail.com");
+    setPassword("G9&kL!zX2@Yt~");
   }
 
   return (
@@ -210,18 +226,20 @@ const LoginScreen = () => {
           }
         /> */}
         {!env.IS_PROD && (
-          <View className="flex flex-row items-center justify-center mx-4 my-3">
-            <Checkbox
-              value={autoCreate}
-              onValueChange={(newValue) => {
-                setAutoCreate(newValue);
-                if (newValue) {
-                  handleUseTestUser();
-                }
-              }}
-            />
-            <Text className="ml-2">Use Test User</Text>
-          </View>
+          <>
+            <View className="flex flex-row items-center justify-center mx-4 my-3">
+              <Checkbox
+                value={autoCreate}
+                onValueChange={(newValue) => {
+                  setAutoCreate(newValue);
+                  if (newValue) {
+                    handleUseTestUser();
+                  }
+                }}
+              />
+              <Text className="ml-2">Use Test User</Text>
+            </View>
+          </>
         )}
         <Text className="text-center">
           Don't have an account?{" "}

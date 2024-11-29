@@ -11,6 +11,7 @@ interface Env {
   TEST_EMAIL?: string;
   TEST_PHONE?: string;
   TEST_PASSWORD?: string;
+  NODE_ENV: string;
   API_DOMAIN_WITH_ENDPOINT: (endpoint: string) => string;
 }
 
@@ -32,9 +33,11 @@ const development: Env = {
     TEST_PASSWORD: "G9&kL!zX2@Yt~",
     TEST_PHONE:  "+19169479669",
     TEST_EMAIL:  "bobloblaw@gmail.com",
+    NODE_ENV: "development",
 };
 
 const production: Env = {
+  NODE_ENV: "production",
   API_DOMAIN: "https://{{endpoint}}-hhjsyj7q4q-uc.a.run.app/",
   APP_NAME: "XLFC",
   BUNDLE_ID: "com.stuka.xlfc",

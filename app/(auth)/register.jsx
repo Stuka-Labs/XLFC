@@ -79,7 +79,7 @@ const RegisterScreen = () => {
 
       const idToken = await currentUser.getIdToken(true);
       // Redirect user based on account type
-      await defaults.get(
+      await defaults.getNew(
         "userInfo",
         currentUser,
         setInProgress,
@@ -138,9 +138,9 @@ const RegisterScreen = () => {
 
         console.log("User registered and logged in successfully.");
 
-        await defaults.get(
+        await defaults.getNew(
           "userInfo",
-          null,
+          {},
           setInProgress,
           async (response) => {
             if (!response.accountType) {

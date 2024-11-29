@@ -18,6 +18,7 @@ import defaults from "@/lib/defaults";
 import env from "@/env";
 import { updateProfile } from "firebase/auth";
 import admin from "@/assets/images/dummy/role_admin.png";
+import Checkbox from "@/components/inputs/Checkbox";
 
 // https://avatars.githubusercontent.com/u/28612032?v=4
 
@@ -83,6 +84,8 @@ const HomeScreen = () => {
   const [showPhotoInput, setShowPhotoInput] = useState(false);
   const [members, setMembers] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [ping, setPing] = useState(false);
+  const [inProgress, setInProgress] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -232,6 +235,24 @@ const HomeScreen = () => {
     }
   };
 
+  async function handlePing() {
+    const token = await auth.currentUser.getIdToken(true);
+    if (!token || token === "") {
+      router.replace("/login");
+    }
+    defaults.getNew(
+      "ping",
+      {},
+      setInProgress,
+      (reponse) => {
+        Alert.alert("Ping", reponse.data.messsage);
+      },
+      console.error,
+      token,
+      undefined
+    );
+  }
+
   return (
     <GestureHandlerRootView>
       <View
@@ -260,7 +281,7 @@ const HomeScreen = () => {
             {/* Conditionally show the photo URL input */}
             {showPhotoInput && (
               <PhotoUrlInput
-                value={photoURL || ""}
+                value={photoURL}
                 onChangeText={handleSetPhotoUrl}
                 onClear={handleClearPhotoUrl}
               />
@@ -295,7 +316,7 @@ const HomeScreen = () => {
                           old_description: team.description,
                         },
                       });
-                      default:
+                    default:
                       router.push({
                         pathname: "/player-stats",
                         params: {
@@ -351,6 +372,18 @@ const HomeScreen = () => {
             )}
             <View className="mb-6" />
           </ScrollView>
+        </View>
+        <View className="flex flex-row items-center justify-center mx-4 my-3">
+          <Checkbox
+            value={ping}
+            onValueChange={(newValue) => {
+              setPing(newValue);
+              if (newValue) {
+                handlePing();
+              }
+            }}
+          />
+          <Text className="ml-2">Ping</Text>
         </View>
         {!env.IS_PROD && (
           <TouchableOpacity

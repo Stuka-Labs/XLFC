@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Redirect user based on account type
-      await defaults.get(
+      await defaults.getNew(
         "userInfo", // Endpoint
         {}, // Params
         setInProgress, // Pass setInProgress to manage state
@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           response.displayName &&
             (await AsyncStorage.setItem("displayName", response.displayName));
         }, // Callback
-        null, // Failed
+        undefined, // Failed
         `${idToken}`, // Token
         undefined // Full URL
       );
@@ -285,18 +285,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // update url to replace the last "/" with ""
       url = url.replace(/\/$/, "");
       console.log("url from authContext to updateUser", url);
-      await defaults.putNew(
-        url, // Endpoint
-        userData, // Request body
-        null, // Optional progress callback
-        async (response) => {
-          console.log("User updated successfully:", response);
-        },
-        async (error) => {
-          console.error("Error updating user:", error);
-        },
-        token
-      );
+      // await defaults.putNew(
+      //   url, // Endpoint
+      //   userData, // Request body
+      //   null, // Optional progress callback
+      //   async (response) => {
+      //     console.log("User updated successfully:", response);
+      //   },
+      //   async (error) => {
+      //     console.error("Error updating user:", error);
+      //   },
+      //   token
+      // );
     } catch (err) {
       console.error("Unexpected error:", err);
     }
