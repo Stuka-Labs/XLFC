@@ -1,11 +1,16 @@
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
-
-platform :ios, '13.4'
+puts File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
+platform :ios, '14.0'
 install! 'cocoapods', :deterministic_uuids => false
 
 target 'XLFC' do
-  use_frameworks! :linkage => :static
+  # use_frameworks! :linkage => :static
+  use_frameworks!
+  use_modular_headers!
   config = use_native_modules!
+
+  # Override Firebase SDK Version
+  $FirebaseSDKVersion = '10.22.0'
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -15,14 +20,34 @@ target 'XLFC' do
   # Firebase dependencies
   pod 'FirebaseAnalytics'
   pod 'Firebase/Auth'
-  pod 'Firebase/Firestore', :modular_headers => true
+  # pod 'Firebase/Firestore', :modular_headers => true
   pod 'Firebase/Storage', :modular_headers => true
+
+  # pod 'RCT-Folly', :podspec => '../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec'
+
+  # pod 'React', :path => '../node_modules/react-native/'
+  # pod 'React-Core', :path => '../node_modules/react-native/React'
 
   post_install do |installer|
     # Set deployment target for all dependencies
     installer.pods_project.targets.each do |target|
+      # if target.name == 'RCT-Folly'
+      #   target.build_configurations.each do |config|
+      #     config.build_settings['HEADER_SEARCH_PATHS'] ||= []
+      #     config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly"
+      #     config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/folly"
+      #   end
+      # end
+      if target.name == 'RCT-Folly'
+        target.build_configurations.each do |config|
+        config.build_settings['HEADER_SEARCH_PATHS'] = "$(inherited) \"${PODS_ROOT}/RCT-Folly\""
+        end
+      end
       target.build_configurations.each do |config|
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17' # Use C++17 standard
+        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'          # Use the modern C++ standard library
       end
 
       # Fix BoringSSL-GRPC flags issue
@@ -37,24 +62,26 @@ target 'XLFC' do
       end
 
       # Fix folly header search paths
-      post_install do |installer|
-        installer.pods_project.targets.each do |target|
-          if target.name == 'RCT-Folly'
-            target.build_configurations.each do |config|
-              config.build_settings['HEADER_SEARCH_PATHS'] ||= []
-              config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/folly"
-              config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/Headers/Public/RCT-Folly"
-            end
-          end
+      if target.name == 'RCT-Folly'
+        target.build_configurations.each do |config|
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= []
+          config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/folly"
+          config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/Headers/Public/RCT-Folly"
         end
       end
+    end
 
     # Resolve React-Core warnings
     installer.generated_projects.each do |project|
       project.targets.each do |target|
         if target.name == 'React-Core'
           target.build_configurations.each do |config|
-            config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+            # Only exclude architectures for non-ARM64 machines
+            if RUBY_PLATFORM.include?('arm64')
+              config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
+            else
+              config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64 i386'
+            end
           end
         end
       end
