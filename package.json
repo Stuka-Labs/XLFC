@@ -1,6 +1,7 @@
 {
   "name": "xlfc",
   "version": "1.0.2",
+  "private": true,
   "scripts": {
     "start": "npx react-native start",
     "ios": "concurrently \"npx react-native start\" \"npx react-native run-ios\"",
@@ -64,6 +65,5 @@
     "react-test-renderer": "^18.2.0",
     "tailwindcss": "3.3.2",
     "typescript": "~5.3.3"
-  },
-  "private": true
+  }
 }

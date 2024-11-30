@@ -20,7 +20,7 @@ target 'XLFC' do
   # Firebase dependencies
   pod 'FirebaseAnalytics'
   pod 'Firebase/Auth'
-  # pod 'Firebase/Firestore', :modular_headers => true
+  pod 'Firebase/Firestore', :modular_headers => true
   pod 'Firebase/Storage', :modular_headers => true
 
   # pod 'RCT-Folly', :podspec => '../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec'
@@ -31,13 +31,14 @@ target 'XLFC' do
   post_install do |installer|
     # Set deployment target for all dependencies
     installer.pods_project.targets.each do |target|
-      # if target.name == 'RCT-Folly'
-      #   target.build_configurations.each do |config|
-      #     config.build_settings['HEADER_SEARCH_PATHS'] ||= []
-      #     config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly"
-      #     config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/folly"
-      #   end
-      # end
+      if target.name == 'RCT-Folly'
+        target.build_configurations.each do |config|
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= []
+          config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/folly"
+          config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/Headers/Public/RCT-Folly"
+          config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/**"
+        end
+      end
       if target.name == 'RCT-Folly'
         target.build_configurations.each do |config|
         config.build_settings['HEADER_SEARCH_PATHS'] = "$(inherited) \"${PODS_ROOT}/RCT-Folly\""
