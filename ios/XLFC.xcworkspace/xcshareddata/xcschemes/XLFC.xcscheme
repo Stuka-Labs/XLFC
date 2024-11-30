@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "25E2E5E1B7F16180193A046869B03410"
-               BuildableName = "libPods-XLFC.a"
+               BuildableName = "Pods_XLFC.framework"
                BlueprintName = "Pods-XLFC"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
@@ -51,7 +51,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "25E2E5E1B7F16180193A046869B03410"
-            BuildableName = "libPods-XLFC.a"
+            BuildableName = "Pods_XLFC.framework"
             BlueprintName = "Pods-XLFC"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">
          </BuildableReference>

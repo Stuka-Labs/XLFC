@@ -1,3 +1,11 @@
 module.exports = {
-    dependencies: {},
+    dependencies: {
+      'react-native': {
+        platforms: {
+          ios: {
+
+          },
+        },
+      },
+    },
   };

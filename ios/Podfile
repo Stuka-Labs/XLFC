@@ -1,16 +1,15 @@
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
-platform :ios, '13.0'
+platform :ios, '13.4'
 install! 'cocoapods', :deterministic_uuids => false
 
 target 'XLFC' do
-  use_frameworks!
+  use_frameworks! :linkage => :static
   config = use_native_modules!
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => true,
-    :fabric_enabled => false
+    :hermes_enabled => false
   )
 
   # Firebase dependencies
@@ -20,10 +19,43 @@ target 'XLFC' do
   pod 'Firebase/Storage', :modular_headers => true
 
   post_install do |installer|
+    # Set deployment target for all dependencies
     installer.pods_project.targets.each do |target|
-      if target.name == 'fmt'
-        target.build_configurations.each do |config|
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+      end
+
+      # Fix BoringSSL-GRPC flags issue
+      if target.name == 'BoringSSL-GRPC'
+        target.source_build_phase.files.each do |file|
+          if file.settings && file.settings['COMPILER_FLAGS']
+            flags = file.settings['COMPILER_FLAGS'].split
+            flags.reject! { |flag| flag == '-GCC_WARN_INHIBIT_ALL_WARNINGS' }
+            file.settings['COMPILER_FLAGS'] = flags.join(' ')
+          end
+        end
+      end
+
+      # Fix folly header search paths
+      post_install do |installer|
+        installer.pods_project.targets.each do |target|
+          if target.name == 'RCT-Folly'
+            target.build_configurations.each do |config|
+              config.build_settings['HEADER_SEARCH_PATHS'] ||= []
+              config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/RCT-Folly/folly"
+              config.build_settings['HEADER_SEARCH_PATHS'] << "$(PODS_ROOT)/Headers/Public/RCT-Folly"
+            end
+          end
+        end
+      end
+
+    # Resolve React-Core warnings
+    installer.generated_projects.each do |project|
+      project.targets.each do |target|
+        if target.name == 'React-Core'
+          target.build_configurations.each do |config|
+            config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+          end
         end
       end
     end
