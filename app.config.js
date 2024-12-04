@@ -1,4 +1,4 @@
-// import 'dotenv/config';
+import 'dotenv/config';
 // // import * as fs from 'fs';
 
 export default ({ config }) => {
@@ -27,7 +27,7 @@ export default ({ config }) => {
       ios: {
         useFrameworks: "static", // Required for Firebase integration
         supportsTablet: true,
-        googleServicesFile: "./assets/GoogleService-Info.plist", // Firebase config
+        googleServicesFile: process.env.GOOGLE_SERVICES_PLIST,
         bundleIdentifier: "com.stuka.xlfc", // Unique iOS identifier
       },
       android: {
