@@ -16,7 +16,7 @@ jobs:
 
       - name: Set up Git with Personal Access Token
         run: |
-          git config --global user.name "your-username"
-          git config --global user.email "your-email@example.com"
+          git config --global user.name "messidagod"
+          git config --global user.email "joeshakely@gmail.com"
           git remote add upstream https://github.com/Stuka-Labs/XLFC-Front.git
           git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Stuka-Labs/XLFC-Front.git jshakely-frontend
