@@ -24,4 +24,4 @@ google-service-info.b64
 /android
 /_ios
 
-credentials.json
+ios/certs/**/*
