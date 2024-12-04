@@ -102,7 +102,7 @@ const RoleScreen = () => {
       setInProgress, // Set progress callback
       async (response) => {
         try {
-          console.log("Response:", response); // Debug the raw response
+          console.log("account", account); // Debug the raw response
           await AsyncStorage.setItem("account", account.account);
 
           if (account.account === "player") {

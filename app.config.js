@@ -27,16 +27,43 @@ export default ({ config }) => {
   }
 
   return {
-    ...config,
-    ios: {
-      ...config.ios,
-      googleServicesFile: './assets/GoogleService-Info.plist',
-      bundleIdentifier: 'com.stuka.xlfc',
-    },
-    android: {
-      ...config.android,
-      googleServicesFile: './assets/google-services.json',
-      package: 'com.stuka.xlfc',
+    expo: {
+      owner: "stukadev",
+      name: "XLFC",
+      slug: "xlfc",
+      scheme: "xlfc",
+      version: "1.0.1",
+      ios: {
+        useFrameworks: "static", // Required for Firebase integration
+        supportsTablet: true,
+        googleServicesFile: "./assets/GoogleService-Info.plist", // Dynamically generated file
+        bundleIdentifier: "com.stuka.xlfc", // Unique iOS identifier
+      },
+      android: {
+        package: "com.stuka.xlfc", // Unique Android identifier
+        googleServicesFile: "./assets/google-services.json", // Dynamically generated file
+      },
+      plugins: [
+        [
+          "expo-build-properties",
+          {
+            ios: {
+              useFrameworks: "static", // Enable static frameworks
+              extraPodspecs: [
+                {
+                  pod: "GoogleUtilities",
+                  options: { modular_headers: true }, // Add modular headers for Firebase
+                },
+              ],
+            },
+          },
+        ],
+      ],
+      extra: {
+        eas: {
+          projectId: "ccb80d1b-1ec1-45d3-8c60-a6e093bfb193",
+        },
+      },
     },
   };
 };
