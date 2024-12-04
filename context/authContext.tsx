@@ -19,13 +19,15 @@ import FirebaseAuthTypes, {
 import defaults from "../lib/defaults";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-} from "firebase/firestore";
+import { app as firebaseApp, firestore } from "@/app/firebaseconfig";
+import { doc, setDoc } from "firebase/firestore";
+// import {
+//   getFirestore,
+//   doc,
+//   setDoc,
+//   getDoc,
+//   onSnapshot,
+// } from "firebase/firestore";
 
 interface AuthContextInterface {
   user?: FirebaseAuthTypes.User | null;
@@ -38,7 +40,7 @@ interface AuthContextInterface {
     firstName: string | undefined,
     lastName: string | undefined,
     phoneNumber: string | undefined
-  ) => Promise<void>;
+  ) => Promise<FirebaseAuthTypes.User | null>;
   logout?: () => Promise<void>;
   loading?: boolean;
   isAutoCreate?: boolean;
@@ -51,7 +53,9 @@ const AuthContext = createContext<AuthContextInterface>({
   login: async (email: string, password: string) => {
     return {} as FirebaseAuthTypes.User;
   },
-  register: async () => {},
+  register: async () => {
+    return {} as FirebaseAuthTypes.User;
+  },
   logout: async () => {},
   loading: false,
   isAutoCreate: false,
@@ -68,17 +72,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [inProgress, setInProgress] = useState(false);
 
   useEffect(() => {
-    const authInstance = getAuth();
-    const firestore = getFirestore();
-    const currentUser = authInstance.currentUser;
+    // Use the initialized Firebase app
+    const authInstance = getAuth(firebaseApp);
 
-    // if (!currentUser) {
-    //   console.log('router', JSON.stringify(router));
-    //   console.warn('No current user found');
-    // }
     if (!env.IS_PROD) {
       try {
         connectAuthEmulator(authInstance, "http://127.0.0.1:9099");
+        console.log("Connected to auth Emulator");
       } catch (error) {
         console.error("Error connecting to Auth Emulator:", error);
       }
@@ -90,12 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       authInstance,
       async (user: User | null) => {
         if (user) {
-          console.log("[authContext.tsx] auth state changed!", user);
+          console.log("[authContext.tsx] auth state changed!");
           setUser(user);
-          console.log('should be setting uid here to ' + user?.uid);
           await AsyncStorage.setItem("uid", user?.uid);
         }
-
         setLoading(false);
       }
     );
@@ -105,8 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (
     email: string | undefined,
-    password: string | undefined,
-    isAutoCreate: boolean = false
+    password: string | undefined
   ) => {
     try {
       setInProgress(true); // Mark the process as in progress
@@ -125,56 +122,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password
       );
       const user = userCredentials.user;
+
+      if (!user) throw new Error("Failed to retrieve logged-in user.");
       setUser(user);
-      const currentUser = auth?.currentUser;
-      if (!currentUser) throw new Error("Failed to retrieve logged-in user.");
 
-      const idToken = await currentUser.getIdToken(true);
+      // const idToken = await user.getIdToken(true);
 
-      console.log("[authContext.tsx] User logged in successfully.");
+      // console.log("[authContext.tsx] User logged in successfully.");
 
-      const uid = await AsyncStorage.getItem("uid");
-      const firstName = await AsyncStorage.getItem("firstName");
-      const surName = await AsyncStorage.getItem("surName");
-      const phoneNumber = await AsyncStorage.getItem("phoneNumber");
-      const displayName = await AsyncStorage.getItem("displayName");
-      if (uid) {
-        await updateUser(
-          uid,
-          {
-            email: email,
-            firstName: firstName,
-            surName: surName,
-            phoneNumber: phoneNumber,
-            displayName: displayName,
-            emailVerified: true,
-          },
-          idToken
-        );
-      }
+      // const uid = await AsyncStorage.getItem("uid");
+      // const firstName = await AsyncStorage.getItem("firstName");
+      // const surName = await AsyncStorage.getItem("surName");
+      // const phoneNumber = await AsyncStorage.getItem("phoneNumber");
+      // const displayName = await AsyncStorage.getItem("displayName");
+      // if (uid) {
+      //   await updateUser(
+      //     uid,
+      //     {
+      //       email: email,
+      //       firstName: firstName,
+      //       surName: surName,
+      //       phoneNumber: phoneNumber,
+      //       displayName: displayName,
+      //       emailVerified: true,
+      //     },
+      //     idToken
+      //   );
+      // }
 
-      // Redirect user based on account type
-      await defaults.getNew(
-        "userInfo", // Endpoint
-        {}, // Params
-        setInProgress, // Pass setInProgress to manage state
-        async (response) => {
-          console.log("Full Response:", response);
+      // // Redirect user based on account type
+      // await defaults.getUserInfo(
+      //   "userInfo", // Endpoint
+      //   { uid: user.uid, email: user.email }, // Params
+      //   setInProgress, // Pass setInProgress to manage state
+      //   async (response) => {
+      //     console.log("Full Response:", response);
 
-          if (!response.accountType) {
-            console.log("No account received from server!");
-            return;
-          }
-          console.log("Account received from server:", response.accountType);
-          response.accountType &&
-            (await AsyncStorage.setItem("account", response.accountType));
-          response.displayName &&
-            (await AsyncStorage.setItem("displayName", response.displayName));
-        }, // Callback
-        undefined, // Failed
-        `${idToken}`, // Token
-        undefined // Full URL
-      );
+      //     if (!response.accountType) {
+      //       console.log("No account received from server!");
+      //       return;
+      //     }
+      //     console.log("Account received from server:", response.accountType);
+      //     response.accountType &&
+      //       (await AsyncStorage.setItem("account", response.accountType));
+      //     response.displayName &&
+      //       (await AsyncStorage.setItem("displayName", response.displayName));
+      //   }, // Callback
+      //   undefined, // Failed
+      //   `${idToken}`, // Token
+      //   undefined // Full URL
+      // );
       return user;
     } catch (error: any) {
       // console.error("Login error:", error);
@@ -223,45 +220,71 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error("Email and Password are required for registration");
       }
 
-      const auth = getAuth();
+      if (!auth) {
+        throw new Error("Not connecting to firebase auth correctly.");
+      }
+
+      console.log("auth from authContext", auth);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
+
+      console.log("userCredential created successfully from authContext");
       const user = userCredential.user;
 
+      // const displayName = `${firstName || ""} ${surName || ""}`.trim();
+
+      // // Update the user's profile in Firebase Auth
+      // await updateProfile(user, { displayName });
+      // const idToken = (await user.getIdToken(true)) || "";
+
+      // // Save data to AsyncStorage
+      // await AsyncStorage.setItem("auth_token", idToken);
+      // await AsyncStorage.multiSet([
+      //   ["email", email],
+      //   ["surName", userDoc.surName || ""],
+      //   ["firstName", userDoc.firstName || ""],
+      //   ["phoneNumber", userDoc.phoneNumber || ""],
+      //   ["displayName", userDoc.displayName],
+      // ]);
+      setUser(user);
       const displayName = `${firstName || ""} ${surName || ""}`.trim();
-
-      // Update the user's profile in Firebase Auth
-      await updateProfile(user, { displayName });
-      const idToken = (await user.getIdToken(true)) || "";
-
-      // Create user object for Firestore
       const userDoc = {
         uid: user.uid,
-        email,
-        firstName,
-        surName,
-        phoneNumber,
+        email: user.email,
+        firstName: firstName || "",
+        surName: surName || "",
+        phoneNumber: phoneNumber || "",
         displayName,
         createdAt: new Date().toISOString(),
+        admin: false, // Default role settings
+        superadmin: false,
+        coach: false,
+        player: true,
       };
 
-      console.log("Registering user in Firestore", userDoc);
+      console.log("Preparing Firestore user document:", userDoc);
 
-      // Save data to AsyncStorage
-      await AsyncStorage.setItem("auth_token", idToken);
-      await AsyncStorage.multiSet([
-        ["email", email],
-        ["surName", userDoc.surName || ""],
-        ["firstName", userDoc.firstName  || ""],
-        ["phoneNumber", userDoc.phoneNumber  || ""],
-        ["displayName", userDoc.displayName],
-      ]);
-      setUser(user);
+      try {
+        console.log("Attempting to set Firestore document...");
+        const userDocRef = doc(firestore, "users", user.uid);
+        await setDoc(userDocRef, userDoc);
+        console.log("User document created successfully!");
+      } catch (firestoreError) {
+        if (firestoreError instanceof Error) {
+          console.error("Firestore Error:", firestoreError.message);
+          console.error("Stack Trace:", firestoreError.stack);
+        } else {
+          console.error("Unknown Firestore Error:", firestoreError);
+        }
+      }
+
+      console.log("User document created in Firestore.");
+      return user;
     } catch (error) {
-      console.error("Error registering: ", error);
+      console.error("Error registering:", error);
       throw error;
     } finally {
       setInProgress(false);
@@ -319,4 +342,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

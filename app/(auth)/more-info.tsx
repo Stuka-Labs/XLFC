@@ -18,6 +18,7 @@ const MoreInfoScreen = () => {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [bmi, setBmi] = useState("");
+  const [inProgress, setInProgress] = useState(false);
 
   async function getToken(auth: FirebaseAuthTypes.Auth | null): Promise<string | undefined> {
     const idToken =
@@ -75,37 +76,56 @@ const MoreInfoScreen = () => {
   }, []);
 
   async function handleSaveData() {
-    if (!auth || !auth.currentUser) {
-      console.error("Auth or currentUser is undefined.");
-      return;
+    try {
+      // Validate authentication
+      if (!auth || !auth.currentUser) {
+        throw new Error("Auth or currentUser is undefined.");
+      }
+
+      // Get ID token and UID
+      const idToken = await auth.currentUser.getIdToken(false);
+      console.log("ID token from more-info.tsx:", idToken);
+
+      const uid = auth.currentUser.uid;
+      if (!uid) {
+        throw new Error("No UID found for the current user.");
+      }
+      console.log("UID from more-info.tsx:", uid);
+
+      // Prepare data
+      if (!weight || !height || !bmi) {
+        throw new Error("Missing required fields: weight, height, or BMI.");
+      }
+
+      const data = {
+        uid: uid,
+        teamId: "xlfc",
+        startWeight: weight,
+        height: height,
+        startBmi: bmi,
+      };
+
+      console.log("Data to be sent:", data);
+
+      // Perform the POST request
+      await defaults.postNew(
+        "createInitialPlayerData", // endpoint
+        data, // params (flattened)
+        setInProgress, // setInProgress
+        async (response) => {
+          console.log("Initial player data saved successfully:", response);
+          return router.replace("/");
+        }, // onSuccess
+        async (error) => {
+          console.error("Error saving initial player data:", error);
+        }, // onError
+        idToken // token
+      );
+    } catch (error) {
+      console.error("Error in handleSaveData:", error);
     }
-    const idToken = await auth.currentUser.getIdToken(true);
-
-    const data = {
-      teamId: "xlfc",
-      token: idToken,
-      uid: user?.uid ?? "",
-      startWeight: weight,
-      height: height,
-      startBmi: bmi,
-    };
-
-    console.log("data", data);
-
-    defaults.postNew(
-      "createInitialPlayerData",
-      data,
-      undefined,
-      async (response) => {
-        console.log("Initial player data saved successfully:", response);
-        router.replace("/");
-      },
-      async (error) => {
-        console.error("Error saving initial player data:", error);
-      },
-      idToken
-    );
   }
+
 
   return (
     <GestureHandlerRootView>
@@ -117,7 +137,7 @@ const MoreInfoScreen = () => {
           </Text>
           <DefaultInput
             label="Start Weight"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Kgs"
             text={weight}
             setText={setWeight}
@@ -130,7 +150,7 @@ const MoreInfoScreen = () => {
           />
           <DefaultInput
             label="Height"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="cm"
             text={height}
             setText={setHeight}
@@ -143,7 +163,7 @@ const MoreInfoScreen = () => {
           />
           <DefaultInput
             label="BMI"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="27 Minimum"
             text={bmi}
             setText={setBmi}

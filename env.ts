@@ -20,17 +20,17 @@ const development: Env = {
   APP_NAME: "XLFC Dev",
   BUNDLE_ID: "com.stuka.xlfc.dev",
   USER_EMAIL: "shakelyconsulting@gmail.com",
-  USER_PASSWORD: "G9&kL!zX2@Yt~",
-  IS_PROD: false,
+  USER_PASSWORD: "AutoUser123!",
+  IS_PROD: true,
   USER_PHONE: "+19169479632",
   API_DOMAIN_WITH_ENDPOINT: (endpoint: string): string =>
-    "http://127.0.0.1:5001/xlfc-e8f8f/us-central1/{{endpoint}}/".replace(
+    "https://{{endpoint}}-hhjsyj7q4q-uc.a.run.app/".replace(
       "{{endpoint}}",
       endpoint
     ),
     DEV_USER_EMAIL: "bobloblaw@gmail.com",
-    DEV_USER_PASSWORD: "G9&kL!zX2@Yt~",
-    TEST_PASSWORD: "G9&kL!zX2@Yt~",
+    DEV_USER_PASSWORD: "AutoUser123!",
+    TEST_PASSWORD: "AutoUser123!",
     TEST_PHONE:  "+19169479669",
     TEST_EMAIL:  "bobloblaw@gmail.com",
     NODE_ENV: "development",
@@ -43,6 +43,8 @@ const production: Env = {
   BUNDLE_ID: "com.stuka.xlfc",
   IS_PROD: true,
   USER_PHONE: "",
+  TEST_PASSWORD: "AutoUser123!",
+  TEST_PHONE:  "+19169479669",
   API_DOMAIN_WITH_ENDPOINT: (endpoint: string): string =>
     "https://{{endpoint}}-hhjsyj7q4q-uc.a.run.app/".replace(
       "{{endpoint}}",

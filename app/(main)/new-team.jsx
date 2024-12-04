@@ -60,16 +60,16 @@ const NewTeamScreen = () => {
               backgroundColor="#EFF1F7"
             />
           </View>
-          <DefaultInput 
+          <DefaultInput
             label="Team Name"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter Team Name"
             text={name}
             setText={setName}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Team Coach"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Select Coach"
             text={coach}
             setText={setCoach}
@@ -77,16 +77,16 @@ const NewTeamScreen = () => {
               <MaterialIcons name="keyboard-arrow-down" size={24} color="#1B1A1E66" />
             }
           />
-          {/* <DefaultInput 
+          {/* <DefaultInput
             label="Number of Participants"
             style="mx-4 my-3"
             placeholder="Enter Number of Participants"
             text={participants}
             setText={setParticipants}
           /> */}
-          <DefaultInput 
+          <DefaultInput
             label="Team Description:"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Type Description..."
             text={description}
             setText={setDescription}
@@ -94,7 +94,7 @@ const NewTeamScreen = () => {
             numberOfLines={3}
           />
         </ScrollView>
-        <ButtonPrimary 
+        <ButtonPrimary
           text="Create Team"
           containerProps="mx-4 my-4"
           inProgress={inProgress}

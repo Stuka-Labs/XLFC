@@ -1,9 +1,8 @@
 import { getApps, initializeApp } from "firebase/app";
-import { initializeAuth, connectAuthEmulator } from "firebase/auth";
-import { getReactNativePersistence } from "firebase/auth/react-native";
-import { getFirestore, connectFirestoreEmulator, collection, addDoc } from "firebase/firestore";
-import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
-import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { initializeAuth, getReactNativePersistence, getAuth} from 'firebase/auth';
+import { getFirestore } from "firebase/firestore";
+import { getFunctions } from "firebase/functions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -16,10 +15,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase app
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-// console.log("app?.options?.projectId", app?.options?.projectId);
-const auth = initializeAuth(app);
+// const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
+
+// const auth = getAuth(app);
 const firestore = getFirestore(app);
 const functions = getFunctions(app);
 
@@ -27,10 +31,13 @@ const functions = getFunctions(app);
 //   const emulatorHost = "127.0.0.1";
 //   console.log("Connecting to emulator at:", emulatorHost);
 
-
 //   addDoc(collection(firestore, "test"), { message: "Hello World!" })
 //     .then((docRef) => console.log("Document written with ID:", docRef.id))
 //     .catch((error) => console.error("Error adding document:", error));
 // }
+// console.log("app", app);
+// console.log("auth", auth);
+// console.log("firestore", firestore);
+// console.log("functions", functions);
 
 export { app, auth, firestore, functions };

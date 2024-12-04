@@ -8,11 +8,11 @@ import DefaultInput from '../../components/inputs/DefaultInput'
 const SearchBar = () => {
 
   const [query, setQuery] = useState('')
-  
+
   return (
     <View>
-      <DefaultInput 
-        style="mx-4"
+      <DefaultInput
+        className="mx-4"
         placeholder="Search for a participant"
         text={query}
         setText={setQuery}

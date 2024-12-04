@@ -1,16 +1,10 @@
-/* eslint-disable no-undef */
 import { Alert, Linking } from "react-native";
-import { Tabs, Redirect, router, useFocusEffect } from "expo-router";
 
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { fileTypeFromFile } from 'file-type'
 // import mime from 'mime'
 // import auth from "@react-native-firebase/auth";
 import env from "@/env";
-import FirebaseAuthTypes, {
-  getAuth,
-} from "firebase/auth";
 
 
 const post = async (
@@ -116,12 +110,12 @@ const get = async (
 
 const getNew = async (
   endpoint: string,
-  params: Record<string, string | number> = {},
+  params: Record<string, any> = {},
   setInProgress?: (inProgress: boolean) => void,
-  onSuccess?: (response: any) => void,
-  onError?: (error: any) => void,
-  token?: string,
-  fullUrl?: string
+  onSuccess?: (response: any) => void | Promise<void>,
+  onError?: ((error: any) => void) | null,
+  token?: string | null,
+  fullUrl?: string | null
 ) => {
   try {
     // Construct the base URL
@@ -138,7 +132,9 @@ const getNew = async (
     const authToken = token ?? (await AsyncStorage.getItem("auth_token"));
 
     // Set the progress indicator to true
-    setInProgress && setInProgress(true);
+    if (setInProgress) {
+      setInProgress(true);
+    }
 
     // Perform the GET request
     const response = await fetch(url, {
@@ -154,6 +150,65 @@ const getNew = async (
     // Handle success and failure
     if (response.ok) {
       console.info("GET Request Success:", { endpoint, params, data });
+      if (onSuccess) {
+        await onSuccess(data);
+      }
+    } else {
+      console.error("GET Request Failed:", { endpoint, params, data });
+      if (onError) {
+        onError(data);
+      }
+    }
+  } catch (error) {
+    console.error("GET Request Error:", { endpoint, params, error });
+    if (onError) {
+      onError(error);
+    }
+  } finally {
+    // Set the progress indicator to false
+    if (setInProgress) {
+      setInProgress(false);
+    }
+  }
+};
+
+
+const getUserInfo = async (
+  endpoint: string,
+  params: Record<string, any> = {},
+  setInProgress?: (inProgress: boolean) => void,
+  onSuccess?: (response: any) => void,
+  onError?: (error: any) => void,
+  token?: string,
+  fullUrl?: string
+) => {
+  try {
+    console.log('endpoint in getUserInfo', endpoint);
+    const baseUrl = fullUrl ?? env.API_DOMAIN_WITH_ENDPOINT(endpoint);
+    const authToken = token ?? (await AsyncStorage.getItem("auth_token"));
+
+    if (!authToken) {
+      throw new Error("Authentication token is missing.");
+    }
+
+    setInProgress && setInProgress(true);
+
+    console.log("Base URL:", baseUrl);
+
+    console.log(`Bearer ${authToken}`)
+    const response = await fetch(baseUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`, // Include the token
+      },
+    });
+
+    // Attempt to parse the raw response as JSON
+    const data = await response.json();
+
+    if (response.ok) {
+      console.info("GET Request Success:", { endpoint, params, data });
       onSuccess && onSuccess(data);
     } else {
       console.error("GET Request Failed:", { endpoint, params, data });
@@ -163,10 +218,10 @@ const getNew = async (
     console.error("GET Request Error:", { endpoint, params, error });
     onError && onError(error);
   } finally {
-    // Set the progress indicator to false
     setInProgress && setInProgress(false);
   }
 };
+
 const postNew = async (
   endpoint: string,
   body: Record<string, any> = {},
@@ -192,7 +247,7 @@ const postNew = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(authToken && { Authorization: `Bearer ${authToken}` }), // Add Authorization header if the token exists
+        ...(authToken && { Authorization: `Bearer ${authToken}` }),
       },
       body: JSON.stringify(body),
     });
@@ -219,22 +274,27 @@ const postNew = async (
 
 const simpleAlert = (
   title: string,
-  message: string | undefined,
-  positive: any,
-  onPress: any,
-  negative = "Cancel"
+  message: string,
+  positive?: string | null,
+  onPress?: () => void | null,
+  negative?: string | null
 ) => {
+  if (!negative) {
+    negative = "Cancel";
+  }
   const options = [
     {
-      text: positive ?? "Okay",
-      onPress: onPress,
+      text: positive ?? "Okay", // Default text for positive button
+      onPress: onPress ?? (() => {}), // Default noop for onPress
     },
   ];
-  if (positive && negative)
+
+  if (negative) {
     options.push({
-      text: negative,
-      onPress: undefined,
+      text: negative, // Text for negative button
+      onPress: () => {}, // Default noop for negative button
     });
+  }
 
   Alert.alert(title, message, options, { cancelable: true });
 };
@@ -291,6 +351,7 @@ export default {
   post: post,
   get: get,
   getNew: getNew,
+  getUserInfo: getUserInfo,
   postNew: postNew,
   putNew: putNew,
   copy: (i: any) => JSON.parse(JSON.stringify(i)),

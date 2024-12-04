@@ -1,29 +1,52 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Keyboard,
+  KeyboardTypeOptions,
+  TextStyle,
+  ViewStyle,
 } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
-  Easing,
   interpolateColor,
 } from "react-native-reanimated";
 import { AsYouType } from "libphonenumber-js";
 
-import { useState } from "react";
+interface DefaultInputProps {
+  text: string;
+  setText: (value: string) => void;
+  label?: string;
+  placeholder?: string;
+  keyboardType?: KeyboardTypeOptions;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  maxLength?: number;
+  secureTextEntry?: boolean;
+  disabled?: boolean;
+  backgroundColorFocused?: string;
+  align?: "start" | "center" | "end";
+  autoFocus?: boolean;
+  showCancel?: boolean;
+  multiline?: boolean;
+  numberOfLines?: number;
+  style?: ViewStyle;
+  className?: string;
+  leftView?: React.ReactNode;
+  rightView?: React.ReactNode;
+  onClick?: () => void;
+}
 
-const DefaultInput = ({
+const DefaultInput: React.FC<DefaultInputProps> = ({
   text,
   setText,
   label,
   placeholder,
   keyboardType,
-  autoCapitalize,
+  autoCapitalize = "none",
   maxLength,
   secureTextEntry,
   disabled = false,
@@ -38,27 +61,27 @@ const DefaultInput = ({
   rightView,
   onClick,
 }) => {
-  const inFocus = useSharedValue(false);
+  const inFocus = useSharedValue<boolean>(false);
 
   const buttonStyle = useAnimatedStyle(() => {
     return {
       borderColor: interpolateColor(
-        inFocus.value,
-        [true, false],
-        ["#1D82C6", "#EFEFEF"]
+        inFocus.value ? 1 : 0,
+        [0, 1],
+        ["#EFEFEF", "#1D82C6"]
       ),
       borderRadius: 15,
-    };
+    } as ViewStyle;
   });
 
   return (
-    <View className={`${style}`}>
+    <View style={style}>
       {label && (
         <Text className="pb-2.5 font-medium text-gray-600">{label}</Text>
       )}
 
       <Animated.View
-        className={`min-h-[52px] px-3 items-center border-[1.5px] flex flex-row space-x-2 justify-${align}`}
+        className={`min-h-[52px] px-6 items-center border-[1.5px] flex flex-row space-x-2 justify-${align}`}
         style={buttonStyle}
       >
         {leftView}
@@ -66,17 +89,16 @@ const DefaultInput = ({
         <TextInput
           style={{
             fontSize: 16,
-
-            flex: align == "center" ? 0 : 1,
+            flex: align === "center" ? 0 : 1,
             paddingVertical: multiline ? 10 : 7.5,
           }}
           onFocus={() => {
-            inFocus.value = withTiming(true, { duration: 200 });
+            inFocus.value = true;
           }}
           onBlur={() => {
-            inFocus.value = withTiming(false, { duration: 200 });
+            inFocus.value = false;
           }}
-          onPress={onClick}
+          onPressIn={onClick}
           editable={!disabled}
           keyboardType={keyboardType}
           secureTextEntry={secureTextEntry}
@@ -89,9 +111,9 @@ const DefaultInput = ({
           numberOfLines={numberOfLines}
           textAlignVertical={multiline ? "top" : "center"}
           onChangeText={(value) => {
-            if (keyboardType == "phone-pad") {
+            if (keyboardType === "phone-pad") {
               const newText = new AsYouType("GH").input(value);
-              if (newText != text) {
+              if (newText !== text) {
                 setText(newText);
                 return;
               }
@@ -103,12 +125,17 @@ const DefaultInput = ({
         {!showCancel && rightView}
         {showCancel && text.length > 0 && (
           <TouchableOpacity
-            className="h-[42px] w-[24px] flex justify-center items-center"
+            style={{
+              height: 42,
+              width: 24,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
             onPress={() => {
               Keyboard.dismiss();
-              if (setText) setText("");
+              setText("");
             }}
-          ></TouchableOpacity>
+          />
         )}
       </Animated.View>
     </View>

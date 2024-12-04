@@ -45,9 +45,9 @@ const WeighInEditorScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <DefaultInput 
+          <DefaultInput
             label="Date of Weigh-in"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter Date"
             text={date}
             setText={setDate}
@@ -58,50 +58,50 @@ const WeighInEditorScreen = () => {
               />
             }
           />
-          <DefaultInput 
+          <DefaultInput
             label="Weight"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter Weight"
             text={weight}
             setText={setWeight}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Food Diary"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="1 or 0"
             text={foodDiary}
             setText={setFoodDiary}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Step Counter"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="1 or 0"
             text={stepCounter}
             setText={setStepCounter}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Weight Loss Milestone"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="1 or 0"
             text={weightLossMilestone}
             setText={setWeightLossMilestone}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Park Run"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="1 or 0"
             text={parkRun}
             setText={setParkRun}
           />
-          <DefaultInput 
+          <DefaultInput
             label="Coaches Bonus"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="1 or 0"
             text={coachesBonus}
             setText={setCoachesBonus}
           />
         </ScrollView>
-        <ButtonPrimary 
+        <ButtonPrimary
           text="Submit"
           containerProps="mx-4 my-4"
           // onPress={() => router.push({

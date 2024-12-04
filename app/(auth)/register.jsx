@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Checkbox from "@/components/inputs/Checkbox";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useFocusEffect, router } from "expo-router";
+import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DefaultInput from "../../components/inputs/DefaultInput";
 import TopNavAction from "../../components/main/TopNavAction";
@@ -14,6 +14,7 @@ import images from "../../assets/images";
 import { useAuth } from "../../context/authContext";
 import defaults from "../../lib/defaults";
 import PasswordInput from "@/components/inputs/PasswordInput";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const predefinedUser = {
   firstName: "Bob",
@@ -40,7 +41,7 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     if (autoCreate) {
-      console.log('[register.tsx] exiting handleRegister')
+      console.log("[register.tsx] exiting handleRegister");
       return;
     }
 
@@ -69,26 +70,34 @@ const RegisterScreen = () => {
       // Register the user
       await register(email, password, firstName, surName, phoneNumber);
 
-      // Log in the user immediately after successful registration
-      await login(email, password);
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredentials.user;
 
-      const currentUser = auth?.currentUser;
-      if (!currentUser) throw new Error("Failed to retrieve logged-in user.");
+      if (!user) throw new Error("Failed to retrieve logged-in user.");
+
+      await AsyncStorage.multiSet([
+        ["email", email],
+        ["password", password],
+      ]);
 
       console.log("User registered and logged in successfully.");
 
-      const idToken = await currentUser.getIdToken(true);
+      const idToken = await user.getIdToken(true);
       // Redirect user based on account type
       await defaults.getNew(
         "userInfo",
-        currentUser,
+        user,
         setInProgress,
         async (response) => {
-          if (!response.account) {
+          if (!response.accountType) {
             return router.replace("/role");
           }
 
-          await AsyncStorage.setItem("account", response.account);
+          await AsyncStorage.setItem("account", response.accountType);
           router.replace("/");
         },
         null,
@@ -97,15 +106,16 @@ const RegisterScreen = () => {
     } catch (error) {
       console.error("Registration Error:", error);
       defaults.simpleAlert("Error", error.message || "Failed to register.");
-      await logout(); // Ensure user is logged out on failure
+      // await logout(); // Ensure user is logged out on failure
     } finally {
       setInProgress(false);
     }
   };
 
   const handleAutoCreate = async () => {
+    await AsyncStorage.removeItem("auth_token");
     if (!autoCreate) {
-      console.log('[register.tsx] starting handleAutoCreate')
+      console.log("[register.tsx] starting handleAutoCreate");
       try {
         setInProgress(true);
         // Save data locally
@@ -118,35 +128,37 @@ const RegisterScreen = () => {
           ["emailVerified", predefinedUser.emailVerified],
         ]);
 
+        console.log("registering in register.tsx");
         await register(
           predefinedUser.email,
           predefinedUser.password,
           predefinedUser.firstName,
           predefinedUser.surName,
-          predefinedUser.phoneNumber,
-          true
+          predefinedUser.phoneNumber
         );
-        await login(predefinedUser.email, predefinedUser.password, true);
-        const currentUser = auth?.currentUser;
-        if (!currentUser) throw new Error("Failed to retrieve logged-in user.");
-        const idToken = await currentUser.getIdToken(true);
-        console.log("currentUser", currentUser);
-        console.log(`email from handleAutoCreate: ${predefinedUser.email}`);
-        console.log(
-          `password from handleAutoCreate: ${predefinedUser.password}`
+
+        const userCredentials = await signInWithEmailAndPassword(
+          auth,
+          predefinedUser.email,
+          predefinedUser.password
         );
+        const user = userCredentials.user;
+
+        if (!user) throw new Error("Failed to retrieve logged-in user.");
 
         console.log("User registered and logged in successfully.");
 
+        const idToken = await user.getIdToken(true);
+        // Redirect user based on account type
         await defaults.getNew(
           "userInfo",
-          {},
+          user,
           setInProgress,
           async (response) => {
             if (!response.accountType) {
               return router.replace("/role");
             }
-            console.log("response", response);
+
             await AsyncStorage.setItem("account", response.accountType);
             router.replace("/");
           },
@@ -170,14 +182,14 @@ const RegisterScreen = () => {
         <ScrollView>
           <DefaultInput
             label="First Name"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter First Name"
             text={firstName}
             setText={setFirstName}
           />
           <DefaultInput
             label="Sur Name"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter Sur Name"
             text={surName}
             setText={setSurName}
@@ -197,7 +209,7 @@ const RegisterScreen = () => {
           /> */}
           <DefaultInput
             label="Email"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter Email Address"
             text={email}
             setText={setEmail}
@@ -206,7 +218,7 @@ const RegisterScreen = () => {
           />
           <DefaultInput
             label="Phone Number"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="+1 000 000 000"
             text={phoneNumber}
             setText={setPhoneNumber}
@@ -225,20 +237,19 @@ const RegisterScreen = () => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
-          {!env.IS_PROD && (
-            <View className="flex flex-row items-center mx-4 my-3">
-              <Checkbox
-                value={autoCreate}
-                onValueChange={(newValue) => {
-                  setAutoCreate(newValue);
-                  if (newValue) {
-                    handleAutoCreate();
-                  }
-                }}
-              />
-              <Text className="ml-2">Auto-create a predefined user</Text>
-            </View>
-          )}
+          {/* {!env.IS_PROD && ( */}
+          <View className="flex flex-row items-center mx-4 my-3">
+            <Checkbox
+              value={autoCreate}
+              onValueChange={(newValue) => {
+                setAutoCreate(newValue);
+                if (newValue) {
+                  handleAutoCreate();
+                }
+              }}
+            />
+            <Text className="ml-2">Auto-create a predefined user</Text>
+          </View>
         </ScrollView>
         <ButtonPrimary
           text="Continue"

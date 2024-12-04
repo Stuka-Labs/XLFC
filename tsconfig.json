@@ -5,8 +5,10 @@
     "jsx": "react",
     "types": [
       "react-native",
-      "node"
+      "node",
+      "nativewind/types"
     ],
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
@@ -28,9 +30,11 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "**/*.jsx"
+    "**/*.jsx",
+    "app/firebaseconfig.js"
   ],
   "exclude": [
-    "node_modules/"
+    "node_modules/",
+    "*__*.tsx",
   ]
 }

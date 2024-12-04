@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useFocusEffect, router } from "expo-router";
+import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../context/authContext";
 import DefaultInput from "../../components/inputs/DefaultInput";
@@ -18,10 +18,12 @@ import images from "../../assets/images";
 import defaults from "../../lib/defaults";
 import LogoutIcon from "../../components/buttons/LogoutIcon";
 import { useState, useEffect, useCallback } from "react";
-import env from "@/env";
+import { app as firebaseApp, firestore } from "@/app/firebaseconfig";
+import { doc, setDoc } from "firebase/firestore";
+
 
 const RoleScreen = () => {
-  const { login, logout, user, auth } = useAuth();
+  const { logout, user, auth } = useAuth();
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [inProgress, setInProgress] = useState(false);
 
@@ -46,13 +48,6 @@ const RoleScreen = () => {
     },
   ];
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!auth || !user) return;
-      refresh();
-    }, [auth, user])
-  );
-
   async function refresh() {
     if (!auth || !user) return;
     console.log("Getting account Type...");
@@ -60,12 +55,31 @@ const RoleScreen = () => {
     await getAccountType();
   }
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (!auth || !user) return;
+  //     refresh();
+  //   }, [auth, user])
+  // );
+
   async function getAccountType() {
     const account = await AsyncStorage.getItem("account");
     console.log("Account Type:", account);
-    if (account) {
-      router.replace("/");
-    }
+    // if (account) {
+    //   router.replace("/");
+    // }
+  }
+
+  useEffect(() => {
+    getAccountType();
+  }, [])
+
+  async function getAccountType() {
+    const account = await AsyncStorage.getItem("account");
+    console.log("Account Type:", account);
+    // if (account) {
+    //   router.replace("/");
+    // }
   }
 
   async function setAccountType(account) {
@@ -73,7 +87,7 @@ const RoleScreen = () => {
       return defaults.simpleAlert("Error", "Please select your role");
     }
 
-    const auth_token = await AsyncStorage.getItem("auth_token");
+    const auth_token = await user.getIdToken(true);
 
     console.log("Account:", account.account);
     if (!account) {
@@ -90,6 +104,31 @@ const RoleScreen = () => {
         try {
           console.log("Response:", response); // Debug the raw response
           await AsyncStorage.setItem("account", account.account);
+
+          if (account.account === "player") {
+            const docObj = {
+              startWeight: 0,
+              height: 0,
+              startBmi: 0,
+              standardPoints: 0,
+              bonusPoints: 0,
+              weightChange: 0,
+            };
+
+            try {
+              console.log("Attempting to set Firestore document...");
+              const userDocRef = doc(firestore, "players", user.uid);
+              await setDoc(userDocRef, docObj);
+            } catch (firestoreError) {
+              if (firestoreError instanceof Error) {
+                console.error("Firestore Error:", firestoreError.message);
+                console.error("Stack Trace:", firestoreError.stack);
+              } else {
+                console.error("Unknown Firestore Error:", firestoreError);
+              }
+            }
+          }
+
           router.replace("/more-info");
         } catch (err) {
           console.error("Error processing response:", err);

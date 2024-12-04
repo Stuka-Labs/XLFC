@@ -20,15 +20,15 @@ const RecoveryScreen = () => {
       <SafeAreaView className="bg-white h-full">
         <TopNavAction title="Forgot Password" />
         <ScrollView>
-          <DefaultInput 
+          <DefaultInput
             label="Enter Your Email"
-            style="mx-4 my-3"
+            className="mx-4 my-3"
             placeholder="Enter Email Address"
             text={email}
             setText={setEmail}
           />
         </ScrollView>
-        <ButtonPrimary 
+        <ButtonPrimary
           text="Continue"
           containerProps="mx-4 my-4"
           onPress={() => router.push('/verification')}

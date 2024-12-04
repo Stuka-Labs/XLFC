@@ -33,7 +33,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   return (
     <DefaultInput
       label="Password"
-      style="mx-4 my-3"
+      className="mx-4 my-3"
       placeholder="Enter Password"
       text={value}
       setText={onChangeText} // Call the onChangeText handler passed as a prop

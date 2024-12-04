@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,jsx,ts,tsx}", 
+    "./app/**/*.{js,jsx,ts,tsx}",
     "./components/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
@@ -21,25 +21,26 @@ module.exports = {
         gray: {
           100: "#CDCDE0",
         },
-        'd-purple': {
-          DEFAULT: '#63519F'
+        "d-purple": {
+          DEFAULT: "#63519F",
         },
-        'd-green': {
+        "d-green": {
           DEFAULT: "#3AB83C",
           100: "#3AB83C",
           200: "#3AB83C",
         },
-        'd-blue': {
-          DEFAULT: "#1D82C6"
+        "d-blue": {
+          DEFAULT: "#1D82C6",
         },
-        'd-orange': {
-          DEFAULT: "#FF736A"
+        "d-orange": {
+          DEFAULT: "#FF736A",
         },
-        'b-secondary': {
-          DEFAULT: '#EFEFEF'
-        }
+        "b-secondary": {
+          DEFAULT: "#EFEFEF",
+        },
       },
     },
   },
   plugins: [],
-}
+  // presets: [require("nativewind/tailwindcss")], // Add this for Nativewind
+};
