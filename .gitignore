@@ -18,3 +18,7 @@ web-build/
 /android_backup
 google-service-info.b64
 *.env*
+*__*.tsx
+
+/ios
+/android
