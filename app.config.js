@@ -32,11 +32,11 @@ export default {
           },
         },
       ],
-    ]
-  },
-  "extra": {
-    "eas": {
-      "projectId": "ccb80d1b-1ec1-45d3-8c60-a6e093bfb193"
+    ],
+    extra: {
+      eas: {
+        projectId: "ccb80d1b-1ec1-45d3-8c60-a6e093bfb193"
+      }
     }
-  }
+  },
 };
