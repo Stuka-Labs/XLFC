@@ -1,9 +1,9 @@
 name: Push to Upstream Stuka-Labs
 
 on:
-  push: # Trigger this workflow on pushes to the repository
+  push:
     branches:
-      - jshakely-frontend # Replace 'main' with the branch you want to monitor
+      - jshakely-frontend
 
 jobs:
   sync-to-upstream:
@@ -11,19 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Git credentials for pushing to upstream
-      - name: Set up Git
+      - name: Set up Git with Personal Access Token
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      # Step 3: Add upstream remote and push changes
-      - name: Push to Upstream
-        run: |
+          git config --global user.name "your-username"
+          git config --global user.email "your-email@example.com"
           git remote add upstream https://github.com/Stuka-Labs/XLFC-Front.git
-          git push upstream jshakely-frontend # Replace 'main' with the branch you want to sync
-
+          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Stuka-Labs/XLFC-Front.git jshakely-frontend
