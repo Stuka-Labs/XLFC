@@ -23,3 +23,5 @@ google-service-info.b64
 /ios
 /android
 /_ios
+
+credentials.json
