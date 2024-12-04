@@ -34,7 +34,7 @@ export default {
     ],
     extra: {
       eas: {
-        projectId: "5a5b1fa7-78ad-49d8-9758-76ba0b79c7a2",
+        projectId: "ccb80d1b-1ec1-45d3-8c60-a6e093bfb193",
       },
       apiUrl: process.env.API_URL,
       DEV_API_DOMAIN: process.env.DEV_API_DOMAIN,
