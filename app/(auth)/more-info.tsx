@@ -103,6 +103,7 @@ const MoreInfoScreen = () => {
         startWeight: weight,
         height: height,
         startBmi: bmi,
+        player: true,
       };
 
       console.log("Data to be sent:", data);
