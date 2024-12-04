@@ -29,11 +29,11 @@ const MoreInfoScreen = () => {
   }
 
   async function addTeamRecord() {
-    if (!auth || !auth.currentUser) {
+    if (!user) {
       console.error("Auth or currentUser is undefined.");
       return;
     }
-    const idToken = await getToken(auth);
+    const idToken = await user.getIdToken(true);
 
     const teamData = {
       uid: user?.uid ?? "",
@@ -78,15 +78,15 @@ const MoreInfoScreen = () => {
   async function handleSaveData() {
     try {
       // Validate authentication
-      if (!auth || !auth.currentUser) {
-        throw new Error("Auth or currentUser is undefined.");
+      if (!user) {
+        throw new Error("User not logged in!");
       }
 
       // Get ID token and UID
-      const idToken = await auth.currentUser.getIdToken(false);
+      const idToken = await user.getIdToken(false);
       console.log("ID token from more-info.tsx:", idToken);
 
-      const uid = auth.currentUser.uid;
+      const uid = user.uid;
       if (!uid) {
         throw new Error("No UID found for the current user.");
       }
