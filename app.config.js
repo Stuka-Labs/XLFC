@@ -3,18 +3,18 @@ import * as fs from 'fs';
 
 export default ({ config }) => {
   // Dynamically write the iOS Firebase configuration
-  if (process.env.GOOGLE_SERVICES_PLIST) {
-    const iosFilePath = './assets/GoogleService-Info.plist';
-    fs.mkdirSync('./assets', { recursive: true }); // Ensure the assets directory exists
-    fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
-  }
+  // if (process.env.GOOGLE_SERVICES_PLIST) {
+  const iosFilePath = './assets/GoogleService-Info.plist';
+  fs.mkdirSync('./assets', { recursive: true }); // Ensure the assets directory exists
+  fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
+  // }
 
-  // Dynamically write the Android Firebase configuration
-  if (process.env.GOOGLE_SERVICES_JSON) {
-    const androidFilePath = './assets/google-services.json';
-    fs.mkdirSync('./assets', { recursive: true }); // Ensure the assets directory exists
-    fs.writeFileSync(androidFilePath, process.env.GOOGLE_SERVICES_JSON, 'utf8');
-  }
+  // // Dynamically write the Android Firebase configuration
+  // if (process.env.GOOGLE_SERVICES_JSON) {
+  //   const androidFilePath = './assets/google-services.json';
+  //   fs.mkdirSync('./assets', { recursive: true }); // Ensure the assets directory exists
+  //   fs.writeFileSync(androidFilePath, process.env.GOOGLE_SERVICES_JSON, 'utf8');
+  // }
 
   return {
     expo: {
