@@ -184,6 +184,7 @@ const getUserInfo = async (
 ) => {
   try {
     console.log('endpoint in getUserInfo', endpoint);
+    // console.log('env', env);
     const baseUrl = fullUrl ?? env.API_DOMAIN_WITH_ENDPOINT(endpoint);
     const authToken = token ?? (await AsyncStorage.getItem("auth_token"));
 

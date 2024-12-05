@@ -19,14 +19,13 @@ export default ({ config }) => {
       description: "XLFC",
       icon: "./assets/images/lion_head.png",
       splash: {
-        "image": "./assets/logo.png",
-        "resizeMode": "cover",
-        "backgroundColor": "#ffffff"
+        "image": "./assets/images/logo.png",
+        "backgroundColor": "transparent"
       },
       ios: {
         useFrameworks: "static", // Required for Firebase integration
         supportsTablet: true,
-        googleServicesFile: ".//GoogleService-Info.plist", // Firebase config
+        googleServicesFile: process.env.GOOGLE_SERVICES_FILE || "./GoogleService-Info.plist",
         bundleIdentifier: "com.stuka.xlfc", // Unique iOS identifier
       },
       android: {

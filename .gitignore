@@ -25,3 +25,5 @@ google-service-info.b64
 /_ios
 
 ios/certs/**/*
+**/GoogleService-Info.plist
+credentials.json
