@@ -37,7 +37,7 @@ export default ({ config }) => {
         useFrameworks: "static", // Required for Firebase integration
         supportsTablet: true,
         bundleIdentifier: "com.stuka.xlfc",
-        googleServicesFile: process.env.GOOGLE_SERVICES_PLIST
+        googleServicesFile: process.env.GOOGLE_SERVICES_PLIST ?? '/Users/joeshakely/repos/XLFC-Front/GoogleService-Info.plist',
       },
       android: {
         package: "com.stuka.xlfc", // Unique Android identifier
