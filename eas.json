@@ -1,20 +1,21 @@
 {
+  "cli": {
+    "version": ">= 13.4.2",
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
-      "environment": "development"
+      "developmentClient": true,
+      "distribution": "internal"
     },
     "preview": {
-      "environment": "preview"
+      "distribution": "internal"
     },
     "production": {
-      "distribution": "store",
-      "env": {
-        "GOOGLE_SERVICES_FILE": "./assets/google-services.json"
-      },
-      "environment": "production"
-    },
-    "my-profile": {
-      "environment": "production"
+      "autoIncrement": true
     }
+  },
+  "submit": {
+    "production": {}
   }
 }
