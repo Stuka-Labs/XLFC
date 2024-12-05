@@ -3,16 +3,16 @@ import * as fs from 'fs';
 
 export default ({ config }) => {
   // Generate iOS Firebase configuration
-  if (process.env.GOOGLE_SERVICES_PLIST) {
-    const iosFilePath = './GoogleService-Info.plist';
-    fs.mkdirSync('./assets', { recursive: true }); // Ensure directory exists
-    fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
-    console.log('Generated GoogleService-Info.plist for iOS.');
-  } else {
-    console.error(
-      'Environment variable GOOGLE_SERVICES_PLIST is missing. Firebase configuration for iOS will fail.'
-    );
-  }
+  // if (process.env.GOOGLE_SERVICES_PLIST) {
+  //   const iosFilePath = './GoogleService-Info.plist';
+  //   fs.mkdirSync('./assets', { recursive: true }); // Ensure directory exists
+  //   fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
+  //   console.log('Generated GoogleService-Info.plist for iOS.');
+  // } else {
+  //   console.error(
+  //     'Environment variable GOOGLE_SERVICES_PLIST is missing. Firebase configuration for iOS will fail.'
+  //   );
+  // }
 
   // // Generate Android Firebase configuration
   // if (process.env.GOOGLE_SERVICES_JSON) {
