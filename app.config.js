@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 export default {
   expo: {
+    owner: "stukadev",
     name: "xlfc",
     slug: "xlfc",
     scheme: "xlfc",
