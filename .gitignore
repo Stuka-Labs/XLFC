@@ -25,5 +25,5 @@ google-service-info.b64
 /_ios
 
 ios/certs/**/*
-assets/*.plist
+
 GoogleService-Info.plist
