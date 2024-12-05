@@ -4,7 +4,7 @@ import * as fs from 'fs';
 export default ({ config }) => {
   // Generate iOS Firebase configuration
   if (process.env.GOOGLE_SERVICES_PLIST) {
-    const iosFilePath = './assets/GoogleService-Info.plist';
+    const iosFilePath = './GoogleService-Info.plist';
     fs.mkdirSync('./assets', { recursive: true }); // Ensure directory exists
     fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
     console.log('Generated GoogleService-Info.plist for iOS.');
@@ -36,8 +36,8 @@ export default ({ config }) => {
       ios: {
         useFrameworks: "static", // Required for Firebase integration
         supportsTablet: true,
-        googleServicesFile: "./assets/GoogleService-Info.plist", // Dynamically generated file
-        bundleIdentifier: "com.stuka.xlfc", // Unique iOS identifier
+        bundleIdentifier: "com.stuka.xlfc",
+        googleServicesFile: "./GoogleService-Info.plist",
       },
       android: {
         package: "com.stuka.xlfc", // Unique Android identifier

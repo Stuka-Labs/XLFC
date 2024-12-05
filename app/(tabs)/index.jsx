@@ -87,55 +87,55 @@ const HomeScreen = () => {
   const [ping, setPing] = useState(false);
   const [inProgress, setInProgress] = useState(false);
 
-  // useEffect(() => {
-  //   async function init() {
-  //     if (!user || !auth?.currentUser) return;
+  useEffect(() => {
+    async function init() {
+      if (!user) return;
 
-  //     setDisplayName(user.displayName);
-  //     setPhotoUrl(user.photoURL);
+      setDisplayName(user.displayName);
+      setPhotoUrl(user.photoURL);
 
-  //     const idToken = await auth.currentUser.getIdToken(true);
+      const idToken = await user.getIdToken(true);
 
-  //     // Fetch players on team
-  //     defaults.getNew(
-  //       "fetchAllPlayersOnTeam",
-  //       { teamId: "xlfc", searchQuery: "xlfc" }, // Add your query parameters here
-  //       (inProgress) => console.log("Fetching in progress:", inProgress),
-  //       (response) => {
-  //         console.log("Response from fetchAllPlayersOnTeam", response.data);
-  //         if (Array.isArray(response.data)) {
-  //           setMembers(response.data.length);
+      // Fetch players on team
+      defaults.getNew(
+        "fetchAllPlayersOnTeam",
+        { teamId: "xlfc", searchQuery: "xlfc" }, // Add your query parameters here
+        (inProgress) => console.log("Fetching in progress:", inProgress),
+        (response) => {
+          console.log("Response from fetchAllPlayersOnTeam", response.data);
+          if (Array.isArray(response.data)) {
+            setMembers(response.data.length);
 
-  //           // console.log('parseInt(response.data[0].height) + parseInt(response.data[0].weight)', parseInt((response.data[0].height)) + parseInt((response.data[0].weight)));
-  //           setTotalPoints(
-  //             parseInt(response.data[0]?.height || 0) +
-  //               parseInt(response.data[0]?.bonusPoints || 0)
-  //           );
-  //         }
-  //       },
-  //       (error) => console.error("Error fetching players:", error),
-  //       idToken // Optional token
-  //     );
+            // console.log('parseInt(response.data[0].height) + parseInt(response.data[0].weight)', parseInt((response.data[0].height)) + parseInt((response.data[0].weight)));
+            setTotalPoints(
+              parseInt(response.data[0]?.height || 0) +
+                parseInt(response.data[0]?.bonusPoints || 0)
+            );
+          }
+        },
+        (error) => console.error("Error fetching players:", error),
+        idToken // Optional token
+      );
 
-  //     // Fetch all teams
-  //     defaults.getNew(
-  //       "fetchAllTeams",
-  //       {}, // No additional query parameters
-  //       (inProgress) =>
-  //         console.log("Fetching all teams in progress:", inProgress),
-  //       (response) => {
-  //         console.log("Response from fetchAllTeams:", response.data);
-  //         if (Array.isArray(response.data)) {
-  //           setTeams(response.data);
-  //         }
-  //       },
-  //       (error) => console.error("Error fetching teams:", error),
-  //       idToken // Optional token
-  //     );
-  //   }
+      // Fetch all teams
+      defaults.getNew(
+        "fetchAllTeams",
+        {}, // No additional query parameters
+        (inProgress) =>
+          console.log("Fetching all teams in progress:", inProgress),
+        (response) => {
+          console.log("Response from fetchAllTeams:", response.data);
+          if (Array.isArray(response.data)) {
+            setTeams(response.data);
+          }
+        },
+        (error) => console.error("Error fetching teams:", error),
+        idToken // Optional token
+      );
+    }
 
-  //   init();
-  // }, [user, members, auth]);
+    init();
+  }, [user, members]);
 
   async function logOut() {
     await AsyncStorage.clear();

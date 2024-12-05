@@ -21,7 +21,6 @@ import { useState, useEffect, useCallback } from "react";
 import { app as firebaseApp, firestore } from "@/app/firebaseconfig";
 import { doc, setDoc } from "firebase/firestore";
 
-
 const RoleScreen = () => {
   const { logout, user, auth } = useAuth();
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -72,7 +71,7 @@ const RoleScreen = () => {
 
   useEffect(() => {
     getAccountType();
-  }, [])
+  }, []);
 
   async function getAccountType() {
     const account = await AsyncStorage.getItem("account");
@@ -89,56 +88,55 @@ const RoleScreen = () => {
 
     const auth_token = await user.getIdToken(true);
 
-    console.log("Account:", account.account);
     if (!account) {
       console.error("No matching account found for selected role.");
       return;
     }
 
-    console.log("account.endpoint from role.jsx", account.endpoint);
-    defaults.post(
-      account.endpoint, // Endpoint
-      {}, // Params
-      setInProgress, // Set progress callback
-      async (response) => {
-        try {
-          console.log("account", account); // Debug the raw response
-          await AsyncStorage.setItem("account", account.account);
+    console.log("account", account); // Debug the raw response
+    await AsyncStorage.setItem("account", account.account);
 
-          if (account.account === "player") {
-            const docObj = {
-              startWeight: 0,
-              height: 0,
-              startBmi: 0,
-              standardPoints: 0,
-              bonusPoints: 0,
-              weightChange: 0,
-            };
+    if (account.account === "player") {
+      const docObj = {
+        startWeight: 0,
+        height: 0,
+        startBmi: 0,
+        standardPoints: 0,
+        bonusPoints: 0,
+        weightChange: 0,
+        player: true,
+      };
 
-            try {
-              console.log("Attempting to set Firestore document...");
-              const userDocRef = doc(firestore, "players", user.uid);
-              await setDoc(userDocRef, docObj);
-            } catch (firestoreError) {
-              if (firestoreError instanceof Error) {
-                console.error("Firestore Error:", firestoreError.message);
-                console.error("Stack Trace:", firestoreError.stack);
-              } else {
-                console.error("Unknown Firestore Error:", firestoreError);
-              }
-            }
-          }
-
-          router.replace("/more-info");
-        } catch (err) {
-          console.error("Error processing response:", err);
+      try {
+        console.log("Attempting to set Firestore document...");
+        const userDocRef = doc(firestore, "players", user.uid);
+        await setDoc(userDocRef, docObj);
+      } catch (firestoreError) {
+        if (firestoreError instanceof Error) {
+          console.error("Firestore Error:", firestoreError.message);
+          console.error("Stack Trace:", firestoreError.stack);
+        } else {
+          console.error("Unknown Firestore Error:", firestoreError);
         }
-      },
-      (error) => {
-        console.error("Post request failed:", error);
-      }, // Failed callback
-      auth_token // Auth token
-    );
+      }
+      console.log("account.endpoint from role.jsx", account.endpoint);
+      defaults.post(
+        account.endpoint, // Endpoint
+        docObj, // Params
+        setInProgress, // Set progress callback
+        async (response) => {
+          try {
+            router.replace("/more-info");
+          } catch (err) {
+            console.error("Error processing response:", err);
+          }
+        },
+        (error) => {
+          console.error("Post request failed:", error);
+        }, // Failed callback
+        auth_token // Auth token
+      );
+    }
   }
 
   const handleLogout = async () => {
