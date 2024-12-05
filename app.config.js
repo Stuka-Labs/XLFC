@@ -3,8 +3,7 @@ import * as fs from 'fs';
 
 export default ({ config }) => {
   if (process.env.GOOGLE_SERVICES_PLIST) {
-    const iosFilePath = './assets/GoogleService-Info.plist';
-    fs.mkdirSync('./assets', { recursive: true });
+    const iosFilePath = './GoogleService-Info.plist';
     fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
     console.info('Generated GoogleService-Info.plist for iOS.');
   } else {
