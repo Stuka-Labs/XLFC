@@ -1,1 +1,1 @@
-echo "$(git remote get-url origin | sed 's/.git$//')/commit/f4643846be23892c3a9326f20a8aecf48cd2e547"
+echo "$(git remote get-url origin | sed 's/.git$//')/commit/65616b396a0a006ac7fbe0366dabd3b1abadb77f"
