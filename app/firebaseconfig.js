@@ -1,8 +1,17 @@
 import { getApps, initializeApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence, getAuth} from 'firebase/auth';
-import { getFirestore } from "firebase/firestore";
-import { getFunctions } from "firebase/functions";
+import { initializeAuth, getReactNativePersistence, connectAuthEmulator } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const isDevelopment = process.env.NODE_ENV === "development";
+const emulatorHost = "127.0.0.1"; // Replace with your emulator's host if different
+
+if (isDevelopment) {
+  console.log("Running in development mode. Connecting to Firebase emulators.");
+} else {
+  console.log("Running in production mode. Connecting to Firebase production services.");
+}
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,29 +24,20 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase app
-// const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const app =
-  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
+// Initialize Firebase services
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
-
-// const auth = getAuth(app);
 const firestore = getFirestore(app);
 const functions = getFunctions(app);
 
-// if (process.env.NODE_ENV === "development") {
-//   const emulatorHost = "127.0.0.1";
-//   console.log("Connecting to emulator at:", emulatorHost);
-
-//   addDoc(collection(firestore, "test"), { message: "Hello World!" })
-//     .then((docRef) => console.log("Document written with ID:", docRef.id))
-//     .catch((error) => console.error("Error adding document:", error));
-// }
-// console.log("app", app);
-// console.log("auth", auth);
-// console.log("firestore", firestore);
-// console.log("functions", functions);
+// Connect to emulators in development mode
+if (isDevelopment) {
+  connectAuthEmulator(auth, `http://${emulatorHost}:9099`);
+  connectFirestoreEmulator(firestore, emulatorHost, 8080);
+  connectFunctionsEmulator(functions, emulatorHost, 5001);
+}
 
 export { app, auth, firestore, functions };

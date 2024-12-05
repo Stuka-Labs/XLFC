@@ -43,7 +43,7 @@ const LeaderboardScreen = () => {
 
   async function logOut(){
     await AsyncStorage.removeItem('auth_token')
-    router.replace('/login')
+    return router.replace('/login')
   }
 
   return (
@@ -60,17 +60,17 @@ const LeaderboardScreen = () => {
         </View>
         <View className="bg-white flex-1 rounded-t-[33.3px] overflow-hidden">
           <Text className="text-xl font-bold px-4 py-6">League Table</Text>
-          
+
           {/* TABLE */}
 
           <View className="">
             <ScrollView horizontal={true}>
               <View>
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                  <Row 
-                    data={tableHead} 
-                    widthArr={widthArr} 
-                    style={{ height: 50 }} 
+                  <Row
+                    data={tableHead}
+                    widthArr={widthArr}
+                    style={{ height: 50 }}
                     textStyle={{ paddingHorizontal: 16 }}
                   />
                 </Table>

@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useAuth } from "../../context/authContext";
 import DefaultInput from "../../components/inputs/DefaultInput";
 import TopNavAction from "../../components/main/TopNavAction";
@@ -12,6 +12,8 @@ import defaults from "@/lib/defaults";
 import env from "@/env";
 import axios from "axios";
 import FirebaseAuthTypes from "firebase/auth";
+import { firestore } from "@/app/firebaseconfig";
+import { doc, getDoc } from "firebase/firestore";
 
 const MoreInfoScreen = () => {
   const { auth, user, logout } = useAuth();
@@ -20,12 +22,35 @@ const MoreInfoScreen = () => {
   const [bmi, setBmi] = useState("");
   const [inProgress, setInProgress] = useState(false);
 
-  async function getToken(auth: FirebaseAuthTypes.Auth | null): Promise<string | undefined> {
-    const idToken =
-      !auth || !auth?.currentUser
-        ? undefined
-        : await auth.currentUser.getIdToken(true);
+  async function getToken(
+    user: FirebaseAuthTypes.User | null
+  ): Promise<string | undefined> {
+    const idToken = !user ? undefined : await user.getIdToken(true);
     return idToken;
+  }
+
+  async function getPlayerInfo() {
+    if (!user) {
+      console.log("no user!!");
+      return router.replace("/login");
+    }
+
+    console.log("fetchPlayerTeams in more info screen");
+
+    // Get a reference to the specific player's document
+    const playerDocRef = doc(firestore, "players", user.uid);
+
+    // Fetch the document
+    const playerDoc = await getDoc(playerDocRef);
+
+    if (playerDoc.exists()) {
+      console.log("Player Data:", playerDoc.data());
+      console.log(playerDoc.data());
+      return router.push("/");
+    } else {
+      console.log("No such document!");
+      return null;
+    }
   }
 
   async function addTeamRecord() {
@@ -42,6 +67,22 @@ const MoreInfoScreen = () => {
       description: "XL Reddings Football Club",
       active: true,
     };
+
+    if (!user) {
+      return router.replace("/login");
+    }
+
+    // Get a reference to the specific player's document
+    const teamsDocRef = doc(firestore, "teams", user.uid);
+
+    // Fetch the document
+    const teamsDoc = await getDoc(teamsDocRef);
+
+    if (teamsDoc.exists()) {
+      // console.log('team for player already exists', JSON.stringify(teamsDoc.data(), null, 2));
+      console.log(teamsDoc.data());
+      return;
+    }
 
     console.log("teamData", teamData);
 
@@ -71,9 +112,12 @@ const MoreInfoScreen = () => {
     );
   }
 
-  useEffect(() => {
-    addTeamRecord();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getPlayerInfo();
+      addTeamRecord();
+    }, [])
+  );
 
   async function handleSaveData() {
     try {
@@ -115,7 +159,7 @@ const MoreInfoScreen = () => {
         setInProgress, // setInProgress
         async (response) => {
           console.log("Initial player data saved successfully:", response);
-          return router.replace("/");
+          // return router.replace("/");
         }, // onSuccess
         async (error) => {
           console.error("Error saving initial player data:", error);
@@ -126,7 +170,6 @@ const MoreInfoScreen = () => {
       console.error("Error in handleSaveData:", error);
     }
   }
-
 
   return (
     <GestureHandlerRootView>

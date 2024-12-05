@@ -75,10 +75,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Use the initialized Firebase app
     const authInstance = getAuth(firebaseApp);
 
-    if (!env.IS_PROD) {
+    if (process.env.NODE_ENV === "development") {
       try {
         connectAuthEmulator(authInstance, "http://127.0.0.1:9099");
-        console.log("Connected to auth Emulator");
+        console.log("Connected to auth Emulator for development.");
       } catch (error) {
         console.error("Error connecting to Auth Emulator:", error);
       }

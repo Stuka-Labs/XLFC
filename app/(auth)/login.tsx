@@ -41,6 +41,9 @@ const LoginScreen = () => {
       }
     }
     getEmailAndPassword();
+    // if (user) {
+    //   return router.push("/");
+    // }
   }, []);
 
   async function handleLogin() {
@@ -76,7 +79,7 @@ const LoginScreen = () => {
             if (response.accountType === "player") {
               return router.replace("/more-info");
             }
-            return router.replace("/");
+            // return router.replace("/");
           },
           undefined,
           `${idToken}`

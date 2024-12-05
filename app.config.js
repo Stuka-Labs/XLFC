@@ -1,13 +1,13 @@
 import 'dotenv/config';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 
 export default ({ config }) => {
-  if (process.env.GOOGLE_SERVICES_PLIST) {
-    const iosFilePath = './GoogleService-Info.plist';
-    fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
-  } else {
-    // ignore
-  }
+  // if (process.env.GOOGLE_SERVICES_PLIST) {
+  //   const iosFilePath = './GoogleService-Info.plist';
+  //   fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
+  // } else {
+  //   // ignore
+  // }
 
   return {
     expo: {
@@ -23,27 +23,18 @@ export default ({ config }) => {
         "backgroundColor": "transparent"
       },
       ios: {
-        useFrameworks: "static", // Required for Firebase integration
+        useFrameworks: "static",
         supportsTablet: true,
-        googleServicesFile: process.env.GOOGLE_SERVICES_FILE || "./GoogleService-Info.plist",
-        bundleIdentifier: "com.stuka.xlfc", // Unique iOS identifier
-      },
-      android: {
-        package: "com.stuka.xlfc", // Unique Android identifier
-        googleServicesFile: "./assets/google-services.json", // Firebase config
+        bundleIdentifier: "com.stuka.xlfc",
       },
       plugins: [
+        "@react-native-firebase/app",
+        "@react-native-firebase/auth",
         [
           "expo-build-properties",
           {
             ios: {
-              useFrameworks: "static", // Enable static frameworks
-              extraPodspecs: [
-                {
-                  pod: "GoogleUtilities",
-                  options: { modular_headers: true }, // Add modular headers for Firebase
-                },
-              ],
+              useFrameworks: "static",
             },
           },
         ],

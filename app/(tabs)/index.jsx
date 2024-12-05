@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Image,
   View,
@@ -87,60 +87,63 @@ const HomeScreen = () => {
   const [ping, setPing] = useState(false);
   const [inProgress, setInProgress] = useState(false);
 
-  useEffect(() => {
-    async function init() {
-      if (!user) return;
+  async function init() {
+    if (!user) return;
 
-      setDisplayName(user.displayName);
-      setPhotoUrl(user.photoURL);
+    setDisplayName(user.displayName);
+    setPhotoUrl(user.photoURL);
 
-      const idToken = await user.getIdToken(true);
+    const idToken = await user.getIdToken(true);
 
-      // Fetch players on team
-      defaults.getNew(
-        "fetchAllPlayersOnTeam",
-        { teamId: "xlfc", searchQuery: "xlfc" }, // Add your query parameters here
-        (inProgress) => console.log("Fetching in progress:", inProgress),
-        (response) => {
-          console.log("Response from fetchAllPlayersOnTeam", response.data);
-          if (Array.isArray(response.data)) {
-            setMembers(response.data.length);
+    // Fetch players on team
+    defaults.getNew(
+      "fetchAllPlayersOnTeam",
+      { teamId: "xlfc", searchQuery: "xlfc" }, // Add your query parameters here
+      setInProgress,
+      (response) => {
+        if (Array.isArray(response.data)) {
+          console.log("data is array");
+          setMembers(response.data.length);
 
-            // console.log('parseInt(response.data[0].height) + parseInt(response.data[0].weight)', parseInt((response.data[0].height)) + parseInt((response.data[0].weight)));
-            setTotalPoints(
-              parseInt(response.data[0]?.height || 0) +
-                parseInt(response.data[0]?.bonusPoints || 0)
-            );
-          }
-        },
-        (error) => console.error("Error fetching players:", error),
-        idToken // Optional token
-      );
+          console.log(
+            "total points",
+            parseInt(response.data[0]?.height || 0) +
+              parseInt(response.data[0]?.bonusPoints || 0)
+          );
+          setTotalPoints(
+            parseInt(response.data[0]?.height || 0) +
+              parseInt(response.data[0]?.bonusPoints || 0)
+          );
+        }
+      },
+      (error) => console.error("Error fetching players:", error),
+      idToken // Optional token
+    );
 
-      // Fetch all teams
-      defaults.getNew(
-        "fetchAllTeams",
-        {}, // No additional query parameters
-        (inProgress) =>
-          console.log("Fetching all teams in progress:", inProgress),
-        (response) => {
-          console.log("Response from fetchAllTeams:", response.data);
-          if (Array.isArray(response.data)) {
-            setTeams(response.data);
-          }
-        },
-        (error) => console.error("Error fetching teams:", error),
-        idToken // Optional token
-      );
-    }
+    // Fetch all teams
+    defaults.getNew(
+      "fetchAllTeams",
+      {}, // No additional query parameters
+      setInProgress,
+      (response) => {
+        if (Array.isArray(response.data)) {
+          setTeams(response.data);
+        }
+      },
+      (error) => console.error("Error fetching teams:", error),
+      idToken // Optional token
+    );
+  }
 
-    init();
-  }, [user, members]);
+  useFocusEffect(
+    useCallback(() => {
+      init();
+    }, [])
+  );
 
   async function logOut() {
-    await AsyncStorage.clear();
     await logout();
-    router.replace("/login");
+    return router.replace("/login");
   }
 
   async function deleteAccount() {
@@ -175,7 +178,7 @@ const HomeScreen = () => {
               if (response.ok) {
                 console.log("Account successfully deleted");
                 await AsyncStorage.clear(); // Clear local storage
-                router.replace("/login"); // Redirect to login
+                return router.replace("/login"); // Redirect to login
               } else {
                 const errorText = await response.text();
                 console.error("Failed to delete account:", errorText);
@@ -238,7 +241,7 @@ const HomeScreen = () => {
   async function handlePing() {
     const token = await auth.currentUser.getIdToken(true);
     if (!token || token === "") {
-      router.replace("/login");
+      return router.replace("/login");
     }
     defaults.getNew(
       "ping",
@@ -373,27 +376,29 @@ const HomeScreen = () => {
             <View className="mb-6" />
           </ScrollView>
         </View>
-        <View className="flex flex-row items-center justify-center mx-4 my-3">
-          <Checkbox
-            value={ping}
-            onValueChange={(newValue) => {
-              setPing(newValue);
-              if (newValue) {
-                handlePing();
-              }
-            }}
-          />
-          <Text className="ml-2">Ping</Text>
-        </View>
-        {!env.IS_PROD && (
-          <TouchableOpacity
-            className="bg-[#FF4D4F] py-3"
-            onPress={deleteAccount}
-          >
-            <Text className="text-white text-center font-bold">
-              Delete Account
-            </Text>
-          </TouchableOpacity>
+        {process.env.NODE_ENV === "development" && (
+          <>
+            <View className="flex flex-row items-center justify-center mx-4 my-3">
+              <Checkbox
+                value={ping}
+                onValueChange={(newValue) => {
+                  setPing(newValue);
+                  if (newValue) {
+                    handlePing();
+                  }
+                }}
+              />
+              <Text className="ml-2">Ping</Text>
+            </View>
+            <TouchableOpacity
+              className="bg-[#FF4D4F] py-3"
+              onPress={deleteAccount}
+            >
+              <Text className="text-white text-center font-bold">
+                Delete Account
+              </Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
     </GestureHandlerRootView>

@@ -6,7 +6,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import auth from "@react-native-firebase/auth";
 import env from "@/env";
 
-
 const post = async (
   endpoint: string,
   params: { token: string },
@@ -94,7 +93,7 @@ const get = async (
     const data = await response.json();
 
     if (response.ok) {
-      console.info("GET Request Success:", { endpoint, params, data });
+      // console.info("GET Request Success:", { endpoint, params, data });
       callback && callback(data);
     } else {
       // console.log("GET Request Failed:", { endpoint, params, data });
@@ -145,16 +144,15 @@ const getNew = async (
       },
     });
 
-    const data = await response.json();
+    const data = JSON.parse(JSON.stringify(await response.json()));
 
     // Handle success and failure
     if (response.ok) {
-      console.info("GET Request Success:", { endpoint, params, data });
       if (onSuccess) {
         await onSuccess(data);
       }
     } else {
-      console.error("GET Request Failed:", { endpoint, params, data });
+      console.error("GET Request Failed:", endpoint);
       if (onError) {
         onError(data);
       }
@@ -172,7 +170,6 @@ const getNew = async (
   }
 };
 
-
 const getUserInfo = async (
   endpoint: string,
   params: Record<string, any> = {},
@@ -183,7 +180,7 @@ const getUserInfo = async (
   fullUrl?: string
 ) => {
   try {
-    console.log('endpoint in getUserInfo', endpoint);
+    console.log("endpoint in getUserInfo", endpoint);
     // console.log('env', env);
     const baseUrl = fullUrl ?? env.API_DOMAIN_WITH_ENDPOINT(endpoint);
     const authToken = token ?? (await AsyncStorage.getItem("auth_token"));
@@ -196,7 +193,7 @@ const getUserInfo = async (
 
     console.log("Base URL:", baseUrl);
 
-    console.log(`Bearer ${authToken}`)
+    console.log(`Bearer ${authToken}`);
     const response = await fetch(baseUrl, {
       method: "GET",
       headers: {
@@ -209,10 +206,10 @@ const getUserInfo = async (
     const data = await response.json();
 
     if (response.ok) {
-      console.info("GET Request Success:", { endpoint, params, data });
+      console.info("GET Request Success:", endpoint);
       onSuccess && onSuccess(data);
     } else {
-      console.error("GET Request Failed:", { endpoint, params, data });
+      console.error("GET Request Failed:", endpoint);
       onError && onError(data);
     }
   } catch (error) {
@@ -272,7 +269,6 @@ const postNew = async (
   }
 };
 
-
 const simpleAlert = (
   title: string,
   message: string,
@@ -306,12 +302,11 @@ async function putNew(
   progressCallback: ((inProgress: boolean) => void) | null,
   onSuccess: (response: any) => Promise<void>,
   onError: (error: any) => Promise<void>,
-  token?: string,
+  token?: string
 ) {
   try {
-
     progressCallback?.(true);
-    console.log('endpoint', endpoint);
+    console.log("endpoint", endpoint);
     console.log(JSON.stringify(body));
     const response = await fetch(endpoint, {
       method: "PUT",
@@ -345,8 +340,6 @@ async function putNew(
     progressCallback?.(false);
   }
 }
-
-
 
 export default {
   post: post,

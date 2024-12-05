@@ -24,7 +24,7 @@ const development: Env = {
   IS_PROD: true,
   USER_PHONE: "+19169479632",
   API_DOMAIN_WITH_ENDPOINT: (endpoint: string): string =>
-    "https://{{endpoint}}-hhjsyj7q4q-uc.a.run.app/".replace(
+    "http://127.0.0.1:5001/xlfc-e8f8f/us-central1/{{endpoint}}/".replace(
       "{{endpoint}}",
       endpoint
     ),
