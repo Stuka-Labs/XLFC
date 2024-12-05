@@ -7,6 +7,7 @@
       "environment": "preview"
     },
     "production": {
+      "distribution": "store",
       "environment": "production"
     },
     "my-profile": {

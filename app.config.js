@@ -19,7 +19,7 @@ export default ({ config }) => {
       ios: {
         useFrameworks: "static", // Required for Firebase integration
         supportsTablet: true,
-        googleServicesFile: "./assets/GoogleService-Info.plist", // Firebase config
+        googleServicesFile: ".//GoogleService-Info.plist", // Firebase config
         bundleIdentifier: "com.stuka.xlfc", // Unique iOS identifier
       },
       android: {
