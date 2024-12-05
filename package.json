@@ -10,7 +10,9 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "dev": "npx expo start"
+    "dev": "npx expo start",
+    "configurelocal": "eas build:configure",
+    "build-local": "eas build --platform ios --profile development"
   },
   "jest": {
     "preset": "jest-expo"

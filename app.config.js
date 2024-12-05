@@ -5,9 +5,8 @@ export default ({ config }) => {
   if (process.env.GOOGLE_SERVICES_PLIST) {
     const iosFilePath = './GoogleService-Info.plist';
     fs.writeFileSync(iosFilePath, process.env.GOOGLE_SERVICES_PLIST, 'utf8');
-    console.info('Generated GoogleService-Info.plist for iOS.');
   } else {
-    console.error('GOOGLE_SERVICES_PLIST is missing. iOS Firebase config will fail.');
+    // ignore
   }
 
   return {
@@ -16,6 +15,14 @@ export default ({ config }) => {
       name: "xlfc",
       slug: "xlfc",
       scheme: "xlfc",
+      version: "1.0.1",
+      description: "XLFC",
+      icon: "./assets/images/lion_head.png",
+      splash: {
+        "image": "./assets/logo.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#ffffff"
+      },
       ios: {
         useFrameworks: "static", // Required for Firebase integration
         supportsTablet: true,
