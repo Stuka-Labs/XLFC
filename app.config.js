@@ -14,17 +14,17 @@ export default ({ config }) => {
     );
   }
 
-  // // Generate Android Firebase configuration
-  // if (process.env.GOOGLE_SERVICES_JSON) {
-  //   const androidFilePath = './assets/google-services.json';
-  //   fs.mkdirSync('./assets', { recursive: true }); // Ensure directory exists
-  //   fs.writeFileSync(androidFilePath, process.env.GOOGLE_SERVICES_JSON, 'utf8');
-  //   console.log('Generated google-services.json for Android.');
-  // } else {
-  //   console.error(
-  //     'Environment variable GOOGLE_SERVICES_JSON is missing. Firebase configuration for Android will fail.'
-  //   );
-  // }
+  // // // Generate Android Firebase configuration
+  // //  if (process.env.GOOGLE_SERVICES_JSON) {
+  // //    const androidFilePath = './assets/google-services.json';
+  // //    fs.mkdirSync('./assets', { recursive: true }); // Ensure directory exists
+  // //    fs.writeFileSync(androidFilePath, process.env.GOOGLE_SERVICES_JSON, 'utf8');
+  // //    console.log('Generated google-services.json for Android.');
+  // //  } else {
+  // //    console.error(
+  // //      'Environment variable GOOGLE_SERVICES_JSON is missing. Firebase configuration for Android will fail.'
+  // //    );
+  // //  }
 
   return {
     expo: {
