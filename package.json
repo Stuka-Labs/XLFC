@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "npx expo start",
+    "start": "export NODE_ENV=production && npx expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -27,7 +27,7 @@
     "@react-native-firebase/functions": "^20.5.0",
     "@react-navigation/native": "^6.0.2",
     "axios": "^1.7.7",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
     "expo": "~51.0.39",
     "expo-auth-session": "~5.5.2",

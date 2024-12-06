@@ -21,13 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { app as firebaseApp, firestore } from "@/app/firebaseconfig";
 import { doc, setDoc } from "firebase/firestore";
-// import {
-//   getFirestore,
-//   doc,
-//   setDoc,
-//   getDoc,
-//   onSnapshot,
-// } from "firebase/firestore";
+import { NODE_ENV, isDevelopment, isProduction } from "@/app/env";
 
 interface AuthContextInterface {
   user?: FirebaseAuthTypes.User | null;
@@ -75,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Use the initialized Firebase app
     const authInstance = getAuth(firebaseApp);
 
-    if (process.env.NODE_ENV === "development") {
+    if (NODE_ENV === "development") {
       try {
         connectAuthEmulator(authInstance, "http://127.0.0.1:9099");
         console.log("Connected to auth Emulator for development.");

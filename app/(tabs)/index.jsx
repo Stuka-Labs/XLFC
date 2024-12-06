@@ -19,6 +19,7 @@ import env from "@/env";
 import { updateProfile } from "firebase/auth";
 import admin from "@/assets/images/dummy/role_admin.png";
 import Checkbox from "@/components/inputs/Checkbox";
+import { NODE_ENV, isDevelopment, isProduction } from "@/app/env";
 
 // https://avatars.githubusercontent.com/u/28612032?v=4
 
@@ -376,7 +377,7 @@ const HomeScreen = () => {
             <View className="mb-6" />
           </ScrollView>
         </View>
-        {process.env.NODE_ENV === "development" && (
+        {NODE_ENV === "development" && (
           <>
             <View className="flex flex-row items-center justify-center mx-4 my-3">
               <Checkbox

@@ -3,8 +3,17 @@ import { initializeAuth, getReactNativePersistence, connectAuthEmulator } from "
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from 'expo-constants';
 
-const isDevelopment = process.env.NODE_ENV === "development";
+const extra = Constants.expoConfig?.extra;
+
+if (!extra) {
+  throw new Error("Expo config is not set correctly. Ensure 'extra' is defined in app.config.js.");
+}
+
+console.log("Extra config:", extra);
+const NODE_ENV = extra.eas.NODE_ENV || "development"; // Fallback to development if undefined
+const isDevelopment = NODE_ENV === "development";
 const emulatorHost = "127.0.0.1"; // Replace with your emulator's host if different
 
 if (isDevelopment) {

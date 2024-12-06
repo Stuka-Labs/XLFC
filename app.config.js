@@ -42,6 +42,11 @@ export default ({ config }) => {
       extra: {
         eas: {
           projectId: "ccb80d1b-1ec1-45d3-8c60-a6e093bfb193",
+          NODE_ENV: process.env.NODE_ENV,
+          API_URL:
+            process.env.NODE_ENV === "production"
+              ? process.env.PROD_API_DOMAIN
+              : process.env.DEV_API_DOMAIN,
         },
       },
     },
